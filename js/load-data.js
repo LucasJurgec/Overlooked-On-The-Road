@@ -5,7 +5,7 @@ Promise.all([ // promise all allows us to load multiple csv files together
     age: d["Age group"],
     sex: d.Sex,
     user: d["Road user"],
-    Hospitalisations: +d.Hospitalisations // the + represents the data being loaded as an integer rather than string
+    hospitalisations: +d.Hospitalisations // the + represents the data being loaded as an integer rather than string
   })),
 
   d3.csv("data/state.csv", d => ({ // loading the state.csv file
@@ -17,6 +17,7 @@ Promise.all([ // promise all allows us to load multiple csv files together
     console.log(main, state); 
 
     // add the data visualisations in here, such as drawHistogram(main)
+    drawLineChart(main)
 
 }).catch(error => {
     console.error("Error loading CSV files:", error); // for error handling
