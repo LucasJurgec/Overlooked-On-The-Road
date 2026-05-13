@@ -28,12 +28,12 @@ const drawLineChart = main => {
         .domain([0, d3.max(motorcycleByYear, d => d.hospitalisations)])
         .range([innerHeight, 0]);
 
-    const bottomAxis = d3.axisBottom(xScale)
+    const bottomAxis = d3.axisBottom(xScale) // scale for bottom axis
         .tickFormat(d3.format("d"));
 
-    const leftAxis = d3.axisLeft(yScale);
+    const leftAxis = d3.axisLeft(yScale); // scale for left axis
 
-    svgline.attr("viewBox", `0 0 ${width} ${height}`)
+    svgline.attr("viewBox", `0 0 ${width} ${height}`) // sets the coordinates and size
         .attr("width", width)
         .attr("height", height);
 
@@ -41,20 +41,20 @@ const drawLineChart = main => {
         .append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`)
 
-    innerChart
+    innerChart // sets where the bottom axis will be 
         .append("g")
         .attr("transform", `translate(0, ${innerHeight})`)
         .call(bottomAxis)
 
-    innerChart
+    innerChart // sets where the left axis will be
         .append("g")
         .call(leftAxis)
 
-    const lineGenerator = d3.line()
+    const lineGenerator = d3.line() // assigns the points
         .x(d => xScale(d.year))
         .y(d => yScale(d.hospitalisations));
 
-    innerChart
+    innerChart // draws the line for the chart
         .append("path")
         .attr("d", lineGenerator(motorcycleByYear))
         .attr("fill", "none")
