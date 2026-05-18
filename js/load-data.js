@@ -12,9 +12,23 @@ Promise.all([ // promise all allows us to load multiple csv files together
     stateYear: +d.Year,
     state: d.State,
     stateHospitalisations: +d.Hospitalisations
+  })),
+
+  d3.csv("data/RegisteredVehicles.csv", d => ({ // loading the RegisteredVehicles.csv file
+    Ryear: +d.Year,
+    nsw: +d.NSW,
+    vic: +d.VIC,
+    qld: +d.QLD,
+    sa: +d.SA,
+    wa: +d.WA,
+    tas: +d.TAS,
+    nt: +d.NT,
+    act: +d.ACT,
+    aus: +d.AUS,
+    type: d["Registered Vehicles"]
   }))
-]).then(([main, state]) => { // use either main or state depending on what data the visualisation will use
-    console.log(main, state); 
+]).then(([main, state, registered]) => { // use either main, state or registered depending on what data the visualisation will use
+    console.log(main, state, registered); 
 
     // add the data visualisations in here, such as drawHistogram(main)
     drawLineChart(main)
