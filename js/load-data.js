@@ -34,7 +34,7 @@ Promise.all([ // promise all allows us to load multiple csv files together
     console.log(main, state, registered, geo); // for checking the data is loading correctly
 
     // add the data visualisations in here, such as drawHistogram(main)
-    drawLineChart(main)
+    drawLineChart(main, registered)
 
 }).catch(error => {
     console.error("Error loading CSV files:", error); // for error handling

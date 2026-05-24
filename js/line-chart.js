@@ -6,32 +6,79 @@ const svgline = d3.select("#line-chart")
     .append("svg")
         .style("border", "1px solid black");
 
-const drawLineChart = main => {
+const drawLineChart = (main, registered) => {
     const margin = { top: 40, right: 170, bottom:25, left: 40 }; // just basic constants for the size of the chart, can be changed later
     const width = 1000;
     const height = 500;
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
+    // get total hospitalisations per year
+
     const motorcycleByYear = d3.rollups( // used getting the total number of motorcycle hospitalisations per year
         main.filter(d => d.user === "Motorcyclist"), // filter for only motorcyclist
         v => d3.sum(v, d => d.hospitalisations), // add up hospitalisations
         d => d.year
-    ).map(([year, hospitalisations]) => ({ year, hospitalisations }))
-     .sort((a, b) => a.year - b.year); // sort so years are lowest to highest
+    ).map(([year, hosp]) => ({ year, hosp }))
+        .sort((a, b) => a.year - b.year); // sort so years are lowest to highest
+
+    const otherHospByYear = d3.rollups(
+        main.filter(d => ["Car", "Heavy transport vehicle", "Other"].includes(d.user)),
+        v => d3.sum(v, d => d.hospitalisations),
+        d => d.year
+    ).map(([year, hosp]) => ({ year, hosp }))
+        .sort((a, b) => a.year - b.year);
+
+    // get registered vehicles
+
+    const regMotoByYear = new Map(
+        registered
+            .filter(d => d.type === "Motorcycles")
+            .map(d => [d.rYear, d.aus])
+    );
+
+    const regTotalByYear = new Map(
+        registered
+            .filter(d => d.type === "Total")
+            .map(d => [d.rYear, d.aus])
+    );
+
+    // calculate per 10,000
+
+    const motoRate = motorcycleByYear
+        .filter(d => regMotoByYear.has(d.year))
+        .map(d => ({
+            year: d.year,
+            rate: (d.hosp / regMotoByYear.get(d.year)) * 10000
+        }))
+        .sort((a, b) => a.year - b.year);
+
+    const otherRate = otherHospByYear
+        .filter(d => regTotalByYear.has(d.year) && regMotoByYear.has(d.year))
+        .map(d => ({
+            year: d.year,
+            rate: (d.hosp / (regTotalByYear.get(d.year) - regMotoByYear.get(d.year))) * 10000
+        }))
+        .sort((a, b) => a.year - b.year);
+
+    const allYears = motoRate.map(d => d.year);
 
     const xScale = d3.scaleLinear() // scale for x axis
         .domain(d3.extent(motorcycleByYear, d => d.year))
         .range([0, innerWidth])
 
-    const yScale = d3.scaleLinear() // scale for y axis
-        .domain([0, d3.max(motorcycleByYear, d => d.hospitalisations)])
+    const yScaleLeft = d3.scaleLinear()
+        .domain([0, d3.max(motoRate, d => d.rate) * 1.1]) // motorcycle rate, higher
+        .range([innerHeight, 0]);
+
+    const yScaleRight = d3.scaleLinear()
+        .domain([0, d3.max(otherRate, d => d.rate) * 1.1]) // non-motorcycle rate, lower
         .range([innerHeight, 0]);
 
     const bottomAxis = d3.axisBottom(xScale) // scale for bottom axis
         .tickFormat(d3.format("d"));
 
-    const leftAxis = d3.axisLeft(yScale); // scale for left axis
+    const leftAxis = d3.axisLeft(yScaleLeft); // scale for left axis
 
     svgline.attr("viewBox", `0 0 ${width} ${height}`) // sets the coordinates and size
         .attr("width", width)
@@ -50,13 +97,25 @@ const drawLineChart = main => {
         .append("g")
         .call(leftAxis)
 
-    const lineGenerator = d3.line() // assigns the points
+    const motoLine = d3.line() // assigns the points
         .x(d => xScale(d.year))
-        .y(d => yScale(d.hospitalisations));
+        .y(d => yScaleLeft(d.rate));
 
-    innerChart // draws the line for the chart
+    const otherLine = d3.line()
+        .x(d => xScale(d.year))
+        .y(d => yScaleLeft(d.rate));
+
+    innerChart
         .append("path")
-        .attr("d", lineGenerator(motorcycleByYear))
+        .attr("d", motoLine(motoRate))
         .attr("fill", "none")
-        .attr("stroke", "green");
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 2);
+
+    innerChart
+        .append("path")
+        .attr("d", otherLine(otherRate))
+        .attr("fill", "none")
+        .attr("stroke", "orange")
+        .attr("stroke-width", 2);
 }
