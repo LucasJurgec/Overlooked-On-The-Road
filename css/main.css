@@ -1,0 +1,457 @@
+/* ─── ACCENT OPTIONS ──────────────────────────────────────────────────────────
+   Uncomment ONE accent block to switch the whole site colour.
+   All three are colourblind-safe (tested against deuteranopia + protanopia).
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Option A — Amber / deep orange (warm, road/warning feel) */
+:root {
+  --accent:        #e07a2a;
+  --accent-dim:    rgba(224, 122, 42, 0.15);
+  --accent-border: rgba(224, 122, 42, 0.35);
+}
+
+/* Option B — Teal / cyan (medical, clinical, cooler)
+:root {
+  --accent:        #2ab8b8;
+  --accent-dim:    rgba(42, 184, 184, 0.15);
+  --accent-border: rgba(42, 184, 184, 0.35);
+}
+*/
+
+/* Option C — Soft purple / violet (neutral, analytics feel)
+:root {
+  --accent:        #9b7fe8;
+  --accent-dim:    rgba(155, 127, 232, 0.15);
+  --accent-border: rgba(155, 127, 232, 0.35);
+}
+*/
+
+/* ─── TOKENS ─────────────────────────────────────────────────────────────────*/
+:root {
+  --bg:          #111111;
+  --bg-raised:   #181818;
+  --border:      rgba(255, 255, 255, 0.08);
+  --text:        #f0f0f0;
+  --text-dim:    #888888;
+  --text-muted:  #555555;
+  --font-sans:   'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-mono:   'JetBrains Mono', 'Fira Mono', 'Courier New', monospace;
+}
+
+/* ─── RESET ──────────────────────────────────────────────────────────────────*/
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ─── NAV ────────────────────────────────────────────────────────────────────*/
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  height: 56px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(17, 17, 17, 0.92);
+  backdrop-filter: blur(8px);
+}
+
+.nav-logo {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  transition: color 0.15s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* ─── LAYOUT ─────────────────────────────────────────────────────────────────*/
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ─── SECTION LABEL PILL ─────────────────────────────────────────────────────*/
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.25em 0.75em;
+  border: 1px solid var(--accent-border);
+  background: var(--accent-dim);
+  border-radius: 2px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.25rem;
+}
+
+/* ─── HERO ───────────────────────────────────────────────────────────────────*/
+.hero {
+  padding: 7rem 0 5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  max-width: 18ch;
+  margin-bottom: 1.75rem;
+}
+
+.hero-sub {
+  font-size: 1.05rem;
+  color: var(--text-dim);
+  max-width: 52ch;
+  margin-bottom: 3rem;
+  line-height: 1.7;
+}
+
+.hero-cta {
+  display: inline-block;
+  padding: 0.75em 2em;
+  background: var(--accent);
+  color: #111;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  transition: opacity 0.15s;
+}
+
+.hero-cta:hover { opacity: 0.85; text-decoration: none; }
+
+/* ─── STAT STRIP ─────────────────────────────────────────────────────────────*/
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+}
+
+.stat-card {
+  padding: 2.5rem 2rem;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-number {
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+}
+
+/* ─── CHART SECTIONS ─────────────────────────────────────────────────────────*/
+.chart-section {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.chart-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.chart-number {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  font-family: var(--font-mono);
+}
+
+.chart-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.4rem;
+}
+
+.chart-desc {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  max-width: 56ch;
+  line-height: 1.65;
+}
+
+/* chart placeholder box */
+.chart-placeholder {
+  width: 100%;
+  height: 420px;
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-placeholder-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* fake axis lines inside placeholder */
+.chart-placeholder::before {
+  content: '';
+  position: absolute;
+  left: 48px;
+  bottom: 36px;
+  right: 24px;
+  top: 24px;
+  border-left: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+/* ─── CONTROLS BAR ───────────────────────────────────────────────────────────*/
+.controls-bar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.control-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+select, input[type="range"] {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  padding: 0.4em 0.75em;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+select:hover, select:focus { border-color: var(--accent); }
+
+input[type="range"] {
+  padding: 0;
+  width: 200px;
+  accent-color: var(--accent);
+}
+
+.year-display {
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--accent);
+  min-width: 3ch;
+}
+
+/* toggle button */
+.toggle-btn {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.toggle-btn button {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.4em 0.9em;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-family: var(--font-sans);
+}
+
+.toggle-btn button.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-right: 1px solid var(--accent-border);
+}
+
+.toggle-btn button:last-child { border-right: none; }
+
+/* ─── ANNOTATION CALLOUT ─────────────────────────────────────────────────────*/
+.callout {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--accent-border);
+  background: var(--accent-dim);
+  border-radius: 2px;
+  margin-top: 1.5rem;
+  max-width: 480px;
+}
+
+.callout-icon {
+  font-size: 1.1rem;
+  margin-top: 0.05rem;
+  flex-shrink: 0;
+}
+
+.callout-text {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+.callout-text strong { color: var(--text); }
+
+/* ─── TOOLTIP ────────────────────────────────────────────────────────────────*/
+.tooltip {
+  position: absolute;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  padding: 0.6rem 0.9rem;
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  color: var(--text);
+  pointer-events: none;
+  border-radius: 2px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  z-index: 50;
+  white-space: nowrap;
+}
+
+/* ─── LEGEND ─────────────────────────────────────────────────────────────────*/
+.legend {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+.legend-swatch {
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ─── FOOTER ─────────────────────────────────────────────────────────────────*/
+footer {
+  padding: 3rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.footer-source {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-family: var(--font-mono);
+}
+
+.footer-team {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────────────────────*/
+@media (max-width: 768px) {
+  .stat-strip { grid-template-columns: 1fr; }
+  .chart-header { flex-direction: column; }
+  .controls-bar { gap: 1rem; }
+  nav { padding: 0 1rem; }
+  .container { padding: 0 1rem; }
+  .hero { padding: 4rem 0 3rem; }
+}

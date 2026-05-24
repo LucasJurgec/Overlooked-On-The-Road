@@ -1,35 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<!-- Metadata and page setup -->
-	<meta charset="UTF-8">
-	<meta name="description" content="">
-	<meta name="keywords" content="">
-	<meta name="author" content="">
-    <title>Overlooked on the Road</title>
-
-    <link rel="stylesheet" href="css/main.css">
-
-    <script src="https://d3js.org/d3.v7.min.js" defer></script> <!--Need to keep at top of the js files-->
-
-    <script src="js/line-chart.js" defer></script>
-
-    <script src="js/load-data.js" defer></script> <!--Need to keep at bottom of the js files-->
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A decade of road crash hospitalisations in Australia, 2011–2021.">
+  <title>Overlooked on the Road</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-    <header>
-        <h1>
-            Overlooked on the Road:<br>
-            A Decade of Motorcycle<br>
-            Hospitalisations in Australia
-        </h1>
-    </header>
-    <main>
-        <div id="line-chart"></div>
-    </main>
-    <footer>
 
-    </footer>
+  <nav>
+    <span class="nav-logo">DV03 · T07</span>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Overview</a></li>
+      <li><a href="visualisation.html">Visualisation</a></li>
+      <li><a href="about.html">About</a></li>
+      <!-- concept prototypes: see /Testing/concepts.html -->
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <p class="hero-eyebrow">⊙ Australia · 2011 – 2021 · BITRE Dataset</p>
+      <h1>Overlooked<br>on the Road</h1>
+      <p class="hero-sub">
+        A decade of road crash hospitalisations reveals a counterintuitive truth:
+        middle-aged Australians bear a disproportionate burden — and where you live
+        makes it dramatically worse.
+      </p>
+      <a href="visualisation.html" class="hero-cta">Explore the Data →</a>
+    </div>
+  </section>
+
+  <!-- KEY STATS -->
+  <section>
+    <div class="container" style="padding-top:0; padding-bottom:0;">
+      <div class="stat-strip">
+
+        <div class="stat-card">
+          <div class="stat-number">2×</div>
+          <div class="stat-label">
+            40–64 year olds are hospitalised at nearly twice<br>
+            the rate of 17–25 year olds — the assumed high-risk group
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-number">~45k</div>
+          <div class="stat-label">
+            Hospitalisations recorded across Australia<br>
+            over the 11-year study period
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-number">3.4×</div>
+          <div class="stat-label">
+            Higher hospitalisation rate in Remote areas<br>
+            compared to Major Cities
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- NARRATIVE INTRO -->
+  <section style="padding: 5rem 0; border-bottom: 1px solid var(--border);">
+    <div class="container">
+      <div class="section-label">× The Story</div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items:start;">
+        <div>
+          <h2 style="font-size:1.6rem; font-weight:800; letter-spacing:-0.01em; margin-bottom:1.25rem; line-height:1.2;">
+            The data flips the common assumption.
+          </h2>
+          <p style="color:var(--text-dim); line-height:1.75; font-size:0.92rem; margin-bottom:1rem;">
+            When people think about road crash risk, they picture young drivers —
+            P-platers, late nights, inexperience. But the BITRE hospitalisation data
+            from 2011 to 2021 tells a different story.
+          </p>
+          <p style="color:var(--text-dim); line-height:1.75; font-size:0.92rem;">
+            Adults aged 40–64 consistently account for the highest hospitalisation
+            counts of any age group. Motorcyclists in this cohort are particularly
+            over-represented — and the gap widens significantly in regional and
+            remote Australia.
+          </p>
+        </div>
+        <div>
+          <div class="section-label">✓ What This Site Covers</div>
+          <ul style="list-style:none; display:flex; flex-direction:column; gap:1rem; margin-top:0.5rem;">
+            <li style="display:flex; gap:0.75rem; font-size:0.85rem; color:var(--text-dim);">
+              <span style="color:var(--accent); font-family:var(--font-mono); flex-shrink:0;">01</span>
+              National trend — is the overall rate improving?
+            </li>
+            <li style="display:flex; gap:0.75rem; font-size:0.85rem; color:var(--text-dim);">
+              <span style="color:var(--accent); font-family:var(--font-mono); flex-shrink:0;">02</span>
+              Breakdown by road user type, age group, and sex
+            </li>
+            <li style="display:flex; gap:0.75rem; font-size:0.85rem; color:var(--text-dim);">
+              <span style="color:var(--accent); font-family:var(--font-mono); flex-shrink:0;">03</span>
+              State-by-state comparison via choropleth map
+            </li>
+            <li style="display:flex; gap:0.75rem; font-size:0.85rem; color:var(--text-dim);">
+              <span style="color:var(--accent); font-family:var(--font-mono); flex-shrink:0;">04</span>
+              Remoteness — city vs regional vs remote rates
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-source">
+          Source: Bureau of Infrastructure and Transport Research Economics (BITRE)<br>
+          Hospitalised Injuries Publication, September 2023 · Years 2011–2021
+        </div>
+        <div class="footer-team">
+          COS30045 Data Visualisation · 2026 S1<br>
+          Team DV03 · T07
+        </div>
+      </div>
+    </div>
+  </footer>
+
 </body>
 </html>

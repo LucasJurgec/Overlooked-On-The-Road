@@ -1,121 +1,248 @@
-// code of drawing the line chart
-// this chart has an x-axis of year and y-axis of Hospitalisations
-// will display the total number of motorcycle hospitalisation in a single year
+// ─── COLOUR PALETTE (Okabe-Ito, colourblind-safe on dark bg) ──────────────────
+const COLORS = {
+  // Road user
+  "Motorcyclist":              "#D55E00",
+  "Car":                       "#56B4E9",
+  "Pedestrian":                "#009E73",
+  "Pedal cyclist":             "#F0E442",
+  "Heavy transport vehicle":   "#CC79A7",
+  "Other":                     "#999999",
+  // Age group
+  "0-7":   "#56B4E9",
+  "8-16":  "#009E73",
+  "17-25": "#F0E442",
+  "26-39": "#E69F00",
+  "40-64": "#D55E00",
+  "65-74": "#CC79A7",
+  "75+":   "#0072B2",
+  // Sex
+  "Male":   "#56B4E9",
+  "Female": "#E69F00",
+  // Remoteness
+  "Major Cities": "#56B4E9",
+  "Regional":     "#E69F00",
+  "Remote":       "#D55E00"
+};
 
-const svgline = d3.select("#line-chart")
-    .append("svg")
-        .style("border", "1px solid black");
+const DIMENSION_FIELD = {
+  "Road User Type": "user",
+  "Age Group":      "age",
+  "Sex":            "sex",
+  "Remoteness":     "remoteness"
+};
 
+// categories to exclude
+const EXCLUDE = new Set(["Intersex or indeterminate or missing", "intersex or indeterminate or missing"]);
+
+// ─── MAIN DRAW FUNCTION ────────────────────────────────────────────────────────
 const drawLineChart = (main, registered) => {
-    const margin = { top: 40, right: 170, bottom:25, left: 40 }; // just basic constants for the size of the chart, can be changed later
-    const width = 1000;
-    const height = 500;
-    const innerWidth = width - margin.left - margin.right;
-    const innerHeight = height - margin.top - margin.bottom;
+  const margin = { top: 24, right: 24, bottom: 48, left: 62 };
+  const totalHeight = 420;
 
-    // get total hospitalisations per year
+  const container = d3.select("#chart-01-container");
+  const totalWidth = container.node().getBoundingClientRect().width || 700;
+  const W = totalWidth - margin.left - margin.right;
+  const H = totalHeight - margin.top - margin.bottom;
 
-    const motorcycleByYear = d3.rollups( // used getting the total number of motorcycle hospitalisations per year
-        main.filter(d => d.user === "Motorcyclist"), // filter for only motorcyclist
-        v => d3.sum(v, d => d.hospitalisations), // add up hospitalisations
-        d => d.year
-    ).map(([year, hosp]) => ({ year, hosp }))
-        .sort((a, b) => a.year - b.year); // sort so years are lowest to highest
+  const svg = container.append("svg")
+    .attr("viewBox", `0 0 ${totalWidth} ${totalHeight}`)
+    .attr("width", "100%")
+    .style("display", "block");
 
-    const otherHospByYear = d3.rollups(
-        main.filter(d => ["Car", "Heavy transport vehicle", "Other"].includes(d.user)),
-        v => d3.sum(v, d => d.hospitalisations),
-        d => d.year
-    ).map(([year, hosp]) => ({ year, hosp }))
-        .sort((a, b) => a.year - b.year);
+  // clip path so lines don't overflow past selected year
+  svg.append("defs").append("clipPath")
+    .attr("id", "lc-clip")
+    .append("rect")
+    .attr("x", 0).attr("y", -margin.top)
+    .attr("width", W + 1).attr("height", totalHeight);
 
-    // get registered vehicles
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const regMotoByYear = new Map(
-        registered
-            .filter(d => d.type === "Motorcycles")
-            .map(d => [d.rYear, d.aus])
-    );
+  // ── scales ──
+  const xScale = d3.scaleLinear().domain([2011, 2021]).range([0, W]);
+  const yScale = d3.scaleLinear().range([H, 0]);
 
-    const regTotalByYear = new Map(
-        registered
-            .filter(d => d.type === "Total")
-            .map(d => [d.rYear, d.aus])
-    );
+  // ── axes ──
+  const xAxisG = g.append("g").attr("transform", `translate(0,${H})`);
+  const yAxisG = g.append("g");
 
-    // calculate per 10,000
+  const styleAxis = sel => {
+    sel.select(".domain").attr("stroke", "rgba(255,255,255,0.12)");
+    sel.selectAll(".tick line").attr("stroke", "rgba(255,255,255,0.12)");
+    sel.selectAll(".tick text").attr("fill", "rgba(255,255,255,0.45)").style("font-size", "11px").style("font-family", "'JetBrains Mono', monospace");
+  };
 
-    const motoRate = motorcycleByYear
-        .filter(d => regMotoByYear.has(d.year))
-        .map(d => ({
-            year: d.year,
-            rate: (d.hosp / regMotoByYear.get(d.year)) * 10000
-        }))
-        .sort((a, b) => a.year - b.year);
+  // ── axis labels ──
+  g.append("text").attr("class", "axis-label")
+    .attr("x", W / 2).attr("y", H + 40)
+    .attr("text-anchor", "middle")
+    .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "11px")
+    .text("Year");
 
-    const otherRate = otherHospByYear
-        .filter(d => regTotalByYear.has(d.year) && regMotoByYear.has(d.year))
-        .map(d => ({
-            year: d.year,
-            rate: (d.hosp / (regTotalByYear.get(d.year) - regMotoByYear.get(d.year))) * 10000
-        }))
-        .sort((a, b) => a.year - b.year);
+  const yLabel = g.append("text").attr("class", "axis-label")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -(H / 2)).attr("y", -50)
+    .attr("text-anchor", "middle")
+    .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "11px");
 
-    const allYears = motoRate.map(d => d.year);
+  // ── grid lines group ──
+  const gridG = g.append("g").attr("class", "grid-lines").lower();
 
-    const xScale = d3.scaleLinear() // scale for x axis
-        .domain(d3.extent(motorcycleByYear, d => d.year))
-        .range([0, innerWidth])
+  // ── line / dot layers (clipped) ──
+  const linesG = g.append("g").attr("clip-path", "url(#lc-clip)");
+  const dotsG  = g.append("g").attr("clip-path", "url(#lc-clip)");
 
-    const yScaleLeft = d3.scaleLinear()
-        .domain([0, d3.max(motoRate, d => d.rate) * 1.1]) // motorcycle rate, higher
-        .range([innerHeight, 0]);
+  // ── tooltip ──
+  const tooltip = d3.select("body").append("div").attr("class", "tooltip").style("display", "none").style("position", "fixed");
 
-    const yScaleRight = d3.scaleLinear()
-        .domain([0, d3.max(otherRate, d => d.rate) * 1.1]) // non-motorcycle rate, lower
-        .range([innerHeight, 0]);
+  // ── state filter label ──
+  const stateLabel = g.append("text").attr("class", "state-filter-label")
+    .attr("x", W).attr("y", -8).attr("text-anchor", "end")
+    .attr("fill", "#e07a2a").style("font-size", "11px")
+    .style("font-family", "'JetBrains Mono', monospace")
+    .text("");
 
-    const bottomAxis = d3.axisBottom(xScale) // scale for bottom axis
-        .tickFormat(d3.format("d"));
+  let currentDim  = "Road User Type";
+  let currentYear = 2021;
+  let currentMode = "absolute";
+  let stateFilter = null;
 
-    const leftAxis = d3.axisLeft(yScaleLeft); // scale for left axis
+  // ─── aggregate data for chosen dimension ──────────────────────────────────
+  function aggregate(dim) {
+    const field = DIMENSION_FIELD[dim];
+    const rows = [];
+    d3.rollup(
+      main,
+      v => d3.sum(v, d => d.hospitalisations),
+      d => d[field],
+      d => d.year
+    ).forEach((yearMap, cat) => {
+      if (EXCLUDE.has(cat)) return;
+      yearMap.forEach((hosp, year) => rows.push({ cat, year, hosp }));
+    });
+    return rows;
+  }
 
-    svgline.attr("viewBox", `0 0 ${width} ${height}`) // sets the coordinates and size
-        .attr("width", width)
-        .attr("height", height);
+  // ─── UPDATE ───────────────────────────────────────────────────────────────
+  function update() {
+    const data = aggregate(currentDim);
+    const cats = [...new Set(data.map(d => d.cat))];
 
-    const innerChart = svgline
-        .append("g")
-        .attr("transform", `translate(${margin.left}, ${margin.top})`)
+    // totals per year for % mode
+    const totals = d3.rollup(data, v => d3.sum(v, d => d.hosp), d => d.year);
 
-    innerChart // sets where the bottom axis will be 
-        .append("g")
-        .attr("transform", `translate(0, ${innerHeight})`)
-        .call(bottomAxis)
+    const getValue = d => currentMode === "percent"
+      ? (d.hosp / (totals.get(d.year) || 1)) * 100
+      : d.hosp;
 
-    innerChart // sets where the left axis will be
-        .append("g")
-        .call(leftAxis)
+    const allValues = data.map(getValue);
+    yScale.domain([0, d3.max(allValues) * 1.12]);
 
-    const motoLine = d3.line() // assigns the points
-        .x(d => xScale(d.year))
-        .y(d => yScaleLeft(d.rate));
+    // axes
+    xAxisG.transition().duration(400)
+      .call(d3.axisBottom(xScale).tickFormat(d3.format("d")).ticks(11));
+    yAxisG.transition().duration(400)
+      .call(d3.axisLeft(yScale).ticks(6).tickFormat(v => currentMode === "percent" ? `${v.toFixed(0)}%` : d3.format(",")(v)));
+    styleAxis(xAxisG); styleAxis(yAxisG);
 
-    const otherLine = d3.line()
-        .x(d => xScale(d.year))
-        .y(d => yScaleLeft(d.rate));
+    yLabel.text(currentMode === "percent" ? "% Share of Hospitalisations" : "Hospitalisations");
 
-    innerChart
-        .append("path")
-        .attr("d", motoLine(motoRate))
-        .attr("fill", "none")
-        .attr("stroke", "steelblue")
-        .attr("stroke-width", 2);
+    // grid
+    gridG.selectAll("line").data(yScale.ticks(6)).join("line")
+      .attr("x1", 0).attr("x2", W)
+      .attr("y1", d => yScale(d)).attr("y2", d => yScale(d))
+      .attr("stroke", "rgba(255,255,255,0.05)").attr("stroke-width", 1);
 
-    innerChart
-        .append("path")
-        .attr("d", otherLine(otherRate))
-        .attr("fill", "none")
-        .attr("stroke", "orange")
-        .attr("stroke-width", 2);
-}
+    const lineGen = d3.line().x(d => xScale(d.year)).y(d => yScale(getValue(d))).curve(d3.curveMonotoneX);
+
+    // ── lines ──
+    linesG.selectAll("path.lc-line").data(cats, d => d).join(
+      enter => enter.append("path").attr("class", "lc-line")
+        .attr("fill", "none").attr("stroke-linejoin", "round").attr("stroke-linecap", "round"),
+      update => update,
+      exit => exit.transition().duration(300).style("opacity", 0).remove()
+    ).transition().duration(500)
+      .attr("stroke", d => COLORS[d] || "#888")
+      .attr("stroke-width", d => currentDim === "Road User Type" && d === "Motorcyclist" ? 3 : 2)
+      .style("opacity", 1)
+      .attr("d", cat => {
+        const pts = data.filter(d => d.cat === cat && d.year <= currentYear).sort((a,b) => a.year - b.year);
+        return lineGen(pts);
+      });
+
+    // ── end dots ──
+    dotsG.selectAll("circle.lc-dot").data(
+      cats.map(cat => {
+        const pts = data.filter(d => d.cat === cat && d.year <= currentYear);
+        return pts.sort((a,b) => b.year - a.year)[0];
+      }).filter(Boolean), d => d.cat
+    ).join(
+      enter => enter.append("circle").attr("class", "lc-dot").attr("r", 4).attr("stroke", "#111").attr("stroke-width", 2),
+      update => update,
+      exit => exit.remove()
+    ).transition().duration(400)
+      .attr("cx", d => xScale(d.year))
+      .attr("cy", d => yScale(getValue(d)))
+      .attr("fill", d => COLORS[d.cat] || "#888");
+
+    // ── invisible wide hover targets ──
+    linesG.selectAll("path.lc-hover").data(cats, d => d).join("path")
+      .attr("class", "lc-hover")
+      .attr("fill", "none").attr("stroke", "transparent").attr("stroke-width", 14)
+      .style("cursor", "pointer")
+      .attr("d", cat => {
+        const pts = data.filter(d => d.cat === cat && d.year <= currentYear).sort((a,b) => a.year - b.year);
+        return lineGen(pts);
+      })
+      .on("mousemove", (event, cat) => {
+        const [mx] = d3.pointer(event);
+        const yr = Math.round(xScale.invert(mx));
+        const pt = data.find(d => d.cat === cat && d.year === yr);
+        if (!pt) return;
+        const val = getValue(pt);
+        tooltip.style("display", "block")
+          .style("left", (event.clientX + 14) + "px").style("top", (event.clientY - 30) + "px")
+          .html(`<strong style="color:${COLORS[cat] || '#aaa'}">${cat}</strong><br>${yr} &nbsp; ${currentMode === "percent" ? val.toFixed(1) + "%" : val.toLocaleString() + " hospitalisations"}`);
+      })
+      .on("mouseleave", () => tooltip.style("display", "none"));
+
+    // ── legend ──
+    const legendEl = document.getElementById("chart-01-legend");
+    if (legendEl) {
+      legendEl.innerHTML = cats.map(cat => `
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:${COLORS[cat] || '#888'}"></div>
+          <span>${cat}</span>
+        </div>`).join("");
+    }
+  }
+
+  // ─── EVENT WIRING ─────────────────────────────────────────────────────────
+  document.getElementById("dimensionPicker").addEventListener("change", function() {
+    currentDim = this.value;
+    stateFilter = null;
+    stateLabel.text("");
+    update();
+  });
+
+  document.querySelectorAll(".lc-mode-btn").forEach(btn => {
+    btn.addEventListener("click", function() {
+      document.querySelectorAll(".lc-mode-btn").forEach(b => b.classList.remove("active"));
+      this.classList.add("active");
+      currentMode = this.dataset.mode;
+      update();
+    });
+  });
+
+  document.addEventListener("yearChange", e => {
+    currentYear = e.detail.year;
+    update();
+  });
+
+  document.addEventListener("stateClick", e => {
+    stateFilter = e.detail.state;
+    stateLabel.text(`State: ${stateFilter}`);
+  });
+
+  update();
+};

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualisation — Overlooked on the Road</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .vis-page-header {
+      padding: 3.5rem 0 2.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .vis-page-header h1 {
+      font-size: 1.8rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 0.4rem;
+    }
+    .vis-page-header p { font-size: 0.85rem; color: var(--text-dim); }
+
+    .global-controls {
+      position: sticky; top: 56px; z-index: 90;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid var(--border);
+      background: rgba(17,17,17,0.96);
+      backdrop-filter: blur(8px);
+    }
+    .global-controls .container {
+      display: flex; align-items: center; gap: 1.75rem; flex-wrap: wrap;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) { .chart-grid { grid-template-columns: 1fr; } }
+
+    #chart-01-container svg,
+    #chart-02-container svg { background: var(--bg-raised); border-radius: 2px; }
+
+    .chart-error {
+      display: none;
+      padding: 1rem;
+      border: 1px solid #c0392b;
+      background: rgba(192,57,43,0.1);
+      color: #e74c3c;
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      border-radius: 2px;
+      margin-bottom: 1rem;
+    }
+
+    /* detail panel */
+    #detail-panel {
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-raised);
+    }
+    .detail-placeholder {
+      width: 100%; height: 220px;
+      border: 1px dashed rgba(255,255,255,0.1);
+      border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .detail-placeholder span {
+      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <span class="nav-logo">DV03 · T07</span>
+    <ul class="nav-links">
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="visualisation.html" class="active">Visualisation</a></li>
+      <li><a href="about.html">About</a></li>
+      <!-- concept prototypes: see /Testing/concepts.html -->
+    </ul>
+  </nav>
+
+  <div class="vis-page-header">
+    <div class="container">
+      <h1>Visualisations</h1>
+      <p>Road crash hospitalisations in Australia · 2011 – 2021</p>
+    </div>
+  </div>
+
+  <!-- ── SHARED YEAR SLIDER ──────────────────────────────────────────────── -->
+  <div class="global-controls">
+    <div class="container">
+      <span class="control-label">Year</span>
+      <div style="display:flex; align-items:center; gap:0.6rem;">
+        <span style="font-size:0.7rem; color:var(--text-muted); font-family:var(--font-mono);">2011</span>
+        <input type="range" id="yearSlider" min="2011" max="2021" value="2021" step="1">
+        <span style="font-size:0.7rem; color:var(--text-muted); font-family:var(--font-mono);">2021</span>
+        <span class="year-display" id="yearDisplay">2021</span>
+      </div>
+      <div style="margin-left:auto; display:flex; align-items:center; gap:0.5rem;">
+        <span class="control-label">↑ shared across both charts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CHART 01 — MULTI-LINE TREND ────────────────────────────────────── -->
+  <section class="chart-section" id="section-01">
+    <div class="container">
+
+      <div class="chart-grid">
+
+        <!-- left: controls + legend -->
+        <div class="chart-meta">
+          <div class="chart-number">01 / National Trend</div>
+          <h2 class="chart-title">Hospitalisation<br>Trend</h2>
+          <p class="chart-desc">
+            National hospitalisations over 2011–2021. Switch dimensions to explore
+            breakdowns by road user type, age group, sex, or remoteness.
+          </p>
+
+          <div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:0.75rem;">
+            <div class="control-group">
+              <span class="control-label">Dimension</span>
+              <select id="dimensionPicker">
+                <option>Road User Type</option>
+                <option>Age Group</option>
+                <option>Sex</option>
+                <option>Remoteness</option>
+              </select>
+            </div>
+
+            <div class="control-group">
+              <span class="control-label">Mode</span>
+              <div class="toggle-btn">
+                <button class="lc-mode-btn active" data-mode="absolute">Absolute</button>
+                <button class="lc-mode-btn" data-mode="percent">% Share</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="chart-01-legend" class="legend" style="margin-top:1.5rem; flex-direction:column; gap:0.5rem;"></div>
+        </div>
+
+        <!-- right: chart -->
+        <div>
+          <div class="section-label">⊙ Use the slider above to animate up to a selected year</div>
+          <div class="chart-error">Failed to load data — open this file via a local server, not file://</div>
+          <div id="chart-01-container"></div>
+
+          <div class="callout" style="margin-top:1.25rem;">
+            <span class="callout-icon" style="color:var(--accent);">!</span>
+            <p class="callout-text">
+              <strong>Key finding:</strong> Switch to <em>Age Group</em> — the
+              <strong>40–64</strong> group is hospitalised at nearly <strong>2×</strong>
+              the rate of 17–25 year olds, flipping the common assumption about young-driver risk.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CHART 02 — STATE CHOROPLETH ────────────────────────────────────── -->
+  <section class="chart-section" id="section-02">
+    <div class="container">
+
+      <div class="chart-grid">
+
+        <!-- left: controls -->
+        <div class="chart-meta">
+          <div class="chart-number">02 / State Comparison</div>
+          <h2 class="chart-title">Hospitalisations<br>by State</h2>
+          <p class="chart-desc">
+            Total hospitalisations per state for the selected year. Use the shared
+            year slider to animate. Click a state to highlight it.
+          </p>
+
+          <p style="margin-top:1rem; font-size:0.73rem; color:var(--text-muted); font-family:var(--font-mono); line-height:1.6;">
+            ⚠ Raw counts — not population-<br>normalised. NSW + QLD dominate<br>due to population size.
+          </p>
+
+          <div style="margin-top:1.75rem;">
+            <span class="control-label">Colour scale</span>
+            <div style="margin-top:0.4rem; display:flex; align-items:center; gap:0.5rem;">
+              <span style="font-size:0.68rem; color:var(--text-muted); font-family:var(--font-mono);">Low</span>
+              <div style="flex:1; height:8px; border-radius:1px; background:linear-gradient(to right, #1e1e1e, #e07a2a);"></div>
+              <span style="font-size:0.68rem; color:var(--text-muted); font-family:var(--font-mono);">High</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- right: map -->
+        <div>
+          <div class="section-label">⊙ Click a state to fire a cross-chart event</div>
+          <div class="chart-error">Failed to load data — open this file via a local server, not file://</div>
+          <div id="chart-02-container"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DETAIL PANEL ────────────────────────────────────────────────────── -->
+  <div id="detail-panel">
+    <div class="container">
+      <div class="section-label">⊙ Detail Panel — click a data point in Chart 01 to expand</div>
+      <p style="font-size:0.82rem; color:var(--text-dim); margin-bottom:1.5rem;">
+        Will show Male vs Female dumbbell chart for the selected year + dimension.
+      </p>
+      <div class="detail-placeholder">
+        <span>[ M/F dumbbell chart — planned interaction ]</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-source">
+          Source: Bureau of Infrastructure and Transport Research Economics (BITRE)<br>
+          Hospitalised Injuries Publication, September 2023 · Years 2011–2021
+        </div>
+        <div class="footer-team">
+          COS30045 Data Visualisation · 2026 S1<br>
+          Team DV03 · T07
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ── SCRIPTS (order matters: D3 → charts → data loader) ─────────────── -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="js/line-chart.js"></script>
+  <script src="js/choropleth.js"></script>
+  <script src="js/load-data.js"></script>
+
+  <script>
+    // shared year slider → fires CustomEvent for both charts
+    const slider  = document.getElementById("yearSlider");
+    const display = document.getElementById("yearDisplay");
+
+    slider.addEventListener("input", () => {
+      display.textContent = slider.value;
+      document.dispatchEvent(new CustomEvent("yearChange", { detail: { year: +slider.value } }));
+    });
+  </script>
+
+</body>
+</html>

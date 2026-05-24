@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — Overlooked on the Road</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <nav>
+    <span class="nav-logo">DV03 · T07</span>
+    <ul class="nav-links">
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="visualisation.html">Visualisation</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+      <!-- concept prototypes: see /Testing/concepts.html -->
+    </ul>
+  </nav>
+
+  <section style="padding: 5rem 0; border-bottom: 1px solid var(--border);">
+    <div class="container">
+      <div class="section-label">× About This Project</div>
+      <h1 style="font-size:2rem; font-weight:800; letter-spacing:-0.01em; margin-bottom:1.5rem;">
+        Team DV03 · T07
+      </h1>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4rem;">
+        <div>
+          <h2 style="font-size:1rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-dim); margin-bottom:1rem;">Team</h2>
+          <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            <div>
+              <div style="font-weight:700; margin-bottom:0.2rem;">Quoc Tri Nguyen</div>
+              <div style="font-size:0.82rem; color:var(--text-dim);">COS30045 Data Visualisation · 2026 Semester 1</div>
+            </div>
+            <div>
+              <div style="font-weight:700; margin-bottom:0.2rem;">Teammate</div>
+              <div style="font-size:0.82rem; color:var(--text-dim);">COS30045 Data Visualisation · 2026 Semester 1</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h2 style="font-size:1rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-dim); margin-bottom:1rem;">Data Sources</h2>
+          <ul style="list-style:none; display:flex; flex-direction:column; gap:0.75rem;">
+            <li style="font-size:0.83rem; color:var(--text-dim); line-height:1.6;">
+              <span style="color:var(--accent); font-family:var(--font-mono);">→</span>
+              Bureau of Infrastructure and Transport Research Economics (BITRE) —
+              <em>Hospitalised Injuries Publication, September 2023</em>. National and
+              state-level road crash hospitalisation data, 2011–2021.
+            </li>
+            <li style="font-size:0.83rem; color:var(--text-dim); line-height:1.6;">
+              <span style="color:var(--accent); font-family:var(--font-mono);">→</span>
+              Australian Bureau of Statistics (ABS) — Registered motor vehicle counts
+              used for per-10,000 normalisation of the line chart.
+            </li>
+            <li style="font-size:0.83rem; color:var(--text-dim); line-height:1.6;">
+              <span style="color:var(--accent); font-family:var(--font-mono);">→</span>
+              State boundary GeoJSON sourced from public ABS ASGS data, used for the
+              choropleth map.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding: 4rem 0;">
+    <div class="container">
+      <div class="section-label">× Tools & Methods</div>
+      <div style="display:grid; grid-template-columns: repeat(3,1fr); gap:2rem; margin-top:0.5rem;">
+        <div style="border:1px solid var(--border); padding:1.5rem;">
+          <div style="font-size:0.7rem; font-family:var(--font-mono); color:var(--text-muted); margin-bottom:0.5rem;">Visualisation</div>
+          <div style="font-weight:700; margin-bottom:0.5rem;">D3.js v7</div>
+          <div style="font-size:0.8rem; color:var(--text-dim);">All charts built with D3. Transitions, scales, axes, and custom interactions.</div>
+        </div>
+        <div style="border:1px solid var(--border); padding:1.5rem;">
+          <div style="font-size:0.7rem; font-family:var(--font-mono); color:var(--text-muted); margin-bottom:0.5rem;">Data Processing</div>
+          <div style="font-weight:700; margin-bottom:0.5rem;">KNIME + Raw CSV</div>
+          <div style="font-size:0.8rem; color:var(--text-dim);">Preprocessing in KNIME; loaded at runtime via d3.csv / d3.json.</div>
+        </div>
+        <div style="border:1px solid var(--border); padding:1.5rem;">
+          <div style="font-size:0.7rem; font-family:var(--font-mono); color:var(--text-muted); margin-bottom:0.5rem;">Design</div>
+          <div style="font-weight:700; margin-bottom:0.5rem;">Custom CSS</div>
+          <div style="font-size:0.8rem; color:var(--text-dim);">Dark mode, colourblind-safe palette, responsive layout.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-source">
+          Source: Bureau of Infrastructure and Transport Research Economics (BITRE)<br>
+          Hospitalised Injuries Publication, September 2023 · Years 2011–2021
+        </div>
+        <div class="footer-team">
+          COS30045 Data Visualisation · 2026 S1<br>
+          Team DV03 · T07
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
