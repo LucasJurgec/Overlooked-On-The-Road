@@ -239,9 +239,12 @@ const drawLineChart = (main, registered) => {
     update();
   });
 
+  // TODO: cross-chart filter not yet implemented
+  // main.csv has no State column so clicking the choropleth cannot filter this chart
+  // plan: overlay selected state's motorcycle trend from state.csv as a dashed line
   document.addEventListener("stateClick", e => {
     stateFilter = e.detail.state;
-    stateLabel.text(`State: ${stateFilter}`);
+    stateLabel.text(stateFilter ? `State: ${stateFilter} (filter not yet implemented)` : "");
   });
 
   update();

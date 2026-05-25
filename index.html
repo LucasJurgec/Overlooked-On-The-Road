@@ -115,6 +115,37 @@
     </div>
   </section>
 
+  <!-- ── KNOWN ISSUES (dev note — remove before final submission) ── -->
+  <section style="padding: 3rem 0; border-bottom: 1px solid var(--border); background: var(--bg-raised);">
+    <div class="container">
+      <div class="section-label" style="border-color:rgba(213,94,0,0.4); background:rgba(213,94,0,0.08); color:#D55E00;">⚠ Work in Progress — Known Issues</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-top:0.5rem;">
+
+        <div>
+          <p style="font-size:0.7rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted); font-family:var(--font-mono); margin-bottom:0.75rem;">Not yet implemented</p>
+          <ul style="list-style:none; display:flex; flex-direction:column; gap:0.6rem;">
+            <li style="font-size:0.8rem; color:var(--text-dim); display:flex; gap:0.6rem;"><span style="color:#D55E00; font-family:var(--font-mono); flex-shrink:0;">✗</span>Cross-chart filter — clicking a state on the choropleth does not update Chart 01 (main.csv has no State column; plan: overlay state motorcycle trend from state.csv as a dashed line)</li>
+            <li style="font-size:0.8rem; color:var(--text-dim); display:flex; gap:0.6rem;"><span style="color:#D55E00; font-family:var(--font-mono); flex-shrink:0;">✗</span>VIC 2012 and NSW 2017 series break annotations not yet on the trend chart</li>
+            <li style="font-size:0.8rem; color:var(--text-dim); display:flex; gap:0.6rem;"><span style="color:#D55E00; font-family:var(--font-mono); flex-shrink:0;">✗</span>M/F dumbbell detail panel is a placeholder — not yet coded</li>
+            <li style="font-size:0.8rem; color:var(--text-dim); display:flex; gap:0.6rem;"><span style="color:#D55E00; font-family:var(--font-mono); flex-shrink:0;">✗</span>Remoteness breakdown not yet wired (data is in main.csv, dimension picker option exists but needs testing)</li>
+            <li style="font-size:0.8rem; color:var(--text-dim); display:flex; gap:0.6rem;"><span style="color:#D55E00; font-family:var(--font-mono); flex-shrink:0;">✗</span>40–64 key finding annotation not yet drawn on Chart 01</li>
+          </ul>
+        </div>
+
+        <div>
+          <p style="font-size:0.7rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted); font-family:var(--font-mono); margin-bottom:0.75rem;">Known bugs</p>
+          <ul style="list-style:none; display:flex; flex-direction:column; gap:0.6rem;">
+            <li style="font-size:0.8rem; color:var(--text-dim); display:flex; gap:0.6rem;"><span style="color:#D55E00; font-family:var(--font-mono); flex-shrink:0;">!</span>Site requires a local server — d3.csv() fails on file:// protocol</li>
+            <li style="font-size:0.8rem; color:var(--text-dim); display:flex; gap:0.6rem;"><span style="color:#D55E00; font-family:var(--font-mono); flex-shrink:0;">!</span>Concept pages (sunburst broken, radar underwhelming) — in /Testing/ only, not linked from main site</li>
+            <li style="font-size:0.8rem; color:var(--text-dim); display:flex; gap:0.6rem;"><span style="color:#D55E00; font-family:var(--font-mono); flex-shrink:0;">!</span>Key stats on this page (~45k, 3.4×) are estimates — need to be verified against actual aggregated data</li>
+            <li style="font-size:0.8rem; color:var(--text-dim); display:flex; gap:0.6rem;"><span style="color:#D55E00; font-family:var(--font-mono); flex-shrink:0;">!</span>CSS empty on main project before this sprint — now populated but untested on mobile</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <footer>
     <div class="container">
       <div class="footer-inner">
