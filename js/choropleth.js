@@ -28,12 +28,12 @@ const drawChoropleth = (stateData, geo) => {
   // ── pre-aggregate state × year → sum ────────────────────────────────────────
   const byYearState = d3.rollup(
     stateData,
-    v => d3.sum(v, d => d.hospitalisations),
+    v => d3.sum(v, d => d.mhospitalisations),
     d => d.year,
     d => d.state
   );
 
-  const maxVal = d3.max(stateData, d => d.hospitalisations);
+  const maxVal = d3.max(stateData, d => d.mhospitalisations);
 
   const colorScale = d3.scaleSequential()
     .domain([0, maxVal])

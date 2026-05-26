@@ -10,7 +10,8 @@ Promise.all([
   d3.csv("data/state.csv", d => ({
     year:             +d.Year,
     state:             d.State,
-    hospitalisations: +d.Hospitalisations
+    mhospitalisations: +d.mHospitalisations,
+    thospitalisations: +d.tHospitalisations
   })),
   d3.csv("data/RegisteredVehicles.csv", d => ({
     year: +d.Year,
