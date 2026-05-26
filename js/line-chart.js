@@ -172,39 +172,26 @@ const drawLineChart = (main, registered) => {
 
     // ── end dots ──
     dotsG.selectAll("circle.lc-dot").data(
-      cats.map(cat => {
-        const pts = data.filter(d => d.cat === cat && d.year <= currentYear);
-        return pts.sort((a,b) => b.year - a.year)[0];
-      }).filter(Boolean), d => d.cat
+      cats.flatMap(cat =>
+        data.filter(d => d.cat === cat && d.year <= currentYear)
+      ), d => `${d.cat}-${d.year}`
     ).join(
-      enter => enter.append("circle").attr("class", "lc-dot").attr("r", 4).attr("stroke", "#111").attr("stroke-width", 2),
+      enter => enter.append("circle").attr("class", "lc-dot").attr("r", 3).attr("stroke", "#111").attr("stroke-width", 2),
       update => update,
       exit => exit.remove()
-    ).transition().duration(400)
+    )
+    .on("mouseover", (event, d) => {
+      const val = getValue(d);
+      tooltip.style("display", "block")
+        .style("left", (event.clientX + 14) + "px").style("top", (event.clientY - 30) + "px")
+        .html(`<strong style="color:${COLORS[d.cat] || '#aaa'}">${d.cat}</strong><br>${d.year} &nbsp; ${currentMode === "percent" ? val.toFixed(1) + "%" : val.toLocaleString() + " hospitalisations"}`);
+    })
+    .on("mouseleave", () => tooltip.style("display", "none"))
+    .transition().duration(400)
+      .attr("r", d => d.year === currentYear ? 5 : 3)
       .attr("cx", d => xScale(d.year))
       .attr("cy", d => yScale(getValue(d)))
       .attr("fill", d => COLORS[d.cat] || "#888");
-
-    // ── invisible wide hover targets ──
-    linesG.selectAll("path.lc-hover").data(cats, d => d).join("path")
-      .attr("class", "lc-hover")
-      .attr("fill", "none").attr("stroke", "transparent").attr("stroke-width", 14)
-      .style("cursor", "pointer")
-      .attr("d", cat => {
-        const pts = data.filter(d => d.cat === cat && d.year <= currentYear).sort((a,b) => a.year - b.year);
-        return lineGen(pts);
-      })
-      .on("mousemove", (event, cat) => {
-        const [mx] = d3.pointer(event);
-        const yr = Math.round(xScale.invert(mx));
-        const pt = data.find(d => d.cat === cat && d.year === yr);
-        if (!pt) return;
-        const val = getValue(pt);
-        tooltip.style("display", "block")
-          .style("left", (event.clientX + 14) + "px").style("top", (event.clientY - 30) + "px")
-          .html(`<strong style="color:${COLORS[cat] || '#aaa'}">${cat}</strong><br>${yr} &nbsp; ${currentMode === "percent" ? val.toFixed(1) + "%" : val.toLocaleString() + " hospitalisations"}`);
-      })
-      .on("mouseleave", () => tooltip.style("display", "none"));
 
     // ── legend ──
     const legendEl = document.getElementById("chart-01-legend");
