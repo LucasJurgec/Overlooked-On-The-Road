@@ -114,40 +114,53 @@
         <!-- left: controls + legend -->
         <div class="chart-meta">
           <div class="chart-number">01 / National Trend</div>
-          <h2 class="chart-title">Hospitalisation<br>Trend</h2>
-          <p class="chart-desc">
-            National hospitalisations over 2011–2021. Switch dimensions to explore
-            breakdowns by road user type, age group, sex, or remoteness.
-          </p>
+            <h2 class="chart-title">Hospitalisation<br>Trend</h2>
+            <p class="chart-desc">
+              National hospitalisations over 2011–2021. Switch dimensions to explore
+              breakdowns by road user type, age group, sex, or remoteness.
+            </p>
 
-          <div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:0.75rem;">
-            <div class="control-group">
-              <span class="control-label">Dimension</span>
-              <select id="dimensionPicker">
-                <option>Road User Type</option>
-                <option>Age Group</option>
-                <option>Sex</option>
-                <option>Remoteness</option>
-              </select>
-            </div>
-
-            <div class="control-group">
-              <span class="control-label">Mode</span>
+            <div class="control-group" style="margin-top:1rem;">
+              <span class="control-label">View</span>
               <div class="toggle-btn">
-                <button class="lc-mode-btn active" data-mode="absolute">Absolute</button>
-                <button class="lc-mode-btn" data-mode="percent">% Share</button>
+                <button class="lc-view-btn" data-view="breakdown">Breakdown</button>
+                <button class="lc-view-btn active" data-view="per10k">Per 10,000 Vehicles</button>
               </div>
             </div>
-          </div>
 
-          <div id="chart-01-legend" class="legend" style="margin-top:1.5rem; flex-direction:column; gap:0.5rem;"></div>
+            <div id="breakdown-controls" style="display:none; flex-direction:column; gap:0.75rem; margin-top:1.5rem;">
+              <div class="control-group">
+                <span class="control-label">Dimension</span>
+                <select id="dimensionPicker">
+                  <option>Road User Type</option>
+                  <option>Age Group</option>
+                  <option>Sex</option>
+                  <option>Remoteness</option>
+                </select>
+              </div>
+
+              <div class="control-group">
+                <span class="control-label">Mode</span>
+                <div class="toggle-btn">
+                  <button class="lc-mode-btn active" data-mode="absolute">Absolute</button>
+                  <button class="lc-mode-btn" data-mode="percent">% Share</button>
+                </div>
+              </div>
+
+              <div id="chart-01-legend" class="legend" style="margin-top:0.5rem; flex-direction:column; gap:0.5rem;"></div>
+            </div>
+
+            <div id="per10k-legend-wrap">
+              <div id="chart-per10k-legend" class="legend" style="margin-top:1.5rem; flex-direction:column; gap:0.5rem;"></div>
+            </div>
         </div>
 
         <!-- right: chart -->
         <div>
           <div class="section-label">⊙ Use the slider above to animate up to a selected year</div>
           <div class="chart-error">Failed to load data — open this file via a local server, not file://</div>
-          <div id="chart-01-container"></div>
+          <div id="chart-01-container" style="display:none;"></div>
+          <div id="chart-per10k-container"></div>
 
           <div class="callout" style="margin-top:1.25rem;">
             <span class="callout-icon" style="color:var(--accent);">!</span>
@@ -235,6 +248,7 @@
   <!-- ── SCRIPTS (order matters: D3 → charts → data loader) ─────────────── -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="js/line-chart.js"></script>
+  <script src="js/per10k-line-chart.js"></script>
   <script src="js/choropleth.js"></script>
   <script src="js/load-data.js"></script>
 
@@ -246,6 +260,18 @@
     slider.addEventListener("input", () => {
       display.textContent = slider.value;
       document.dispatchEvent(new CustomEvent("yearChange", { detail: { year: +slider.value } }));
+    });
+
+    document.querySelectorAll(".lc-view-btn").forEach(btn => {
+      btn.addEventListener("click", function() {
+        document.querySelectorAll(".lc-view-btn").forEach(b => b.classList.remove("active"));
+        this.classList.add("active");
+        const view = this.dataset.view;
+        document.getElementById("chart-01-container").style.display     = view === "breakdown" ? "block" : "none";
+        document.getElementById("chart-per10k-container").style.display = view === "per10k"    ? "block" : "none";
+        document.getElementById("breakdown-controls").style.display     = view === "breakdown" ? "flex"  : "none";
+        document.getElementById("per10k-legend-wrap").style.display     = view === "per10k"    ? "block" : "none";
+      });
     });
   </script>
 

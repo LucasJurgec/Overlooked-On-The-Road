@@ -16,12 +16,21 @@ Promise.all([
   d3.csv("data/RegisteredVehicles.csv", d => ({
     year: +d.Year,
     aus:  +d.AUS,
+    nsw:   +d.NSW,
+    vic:   +d.VIC,
+    qld:   +d.QLD,
+    sa:    +d.SA,
+    wa:    +d.WA,
+    tas:   +d.TAS,
+    nt:    +d.NT,
+    act:   +d.ACT,
     type:  d["Registered Vehicles"]
   })),
   d3.json("data/states.geojson")
 ]).then(([main, state, registered, geo]) => {
   drawLineChart(main, registered);
   drawChoropleth(state, geo);
+  drawPer10kChart(state, registered);
 }).catch(err => {
   console.error("Data load failed:", err);
   document.querySelectorAll(".chart-error").forEach(el => {
