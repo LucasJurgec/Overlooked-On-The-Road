@@ -16,8 +16,8 @@ const COLORS = {
   "65-74": "#CC79A7",
   "75+":   "#0072B2",
   // Sex
-  "Male":   "#56B4E9",
-  "Female": "#E69F00",
+  "Male":   "#009E73",
+  "Female": "#CC79A7",
   // Remoteness
   "Major Cities": "#56B4E9",
   "Regional":     "#E69F00",

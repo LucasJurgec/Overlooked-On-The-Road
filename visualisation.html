@@ -234,17 +234,51 @@
   </section>
 
   <!-- ── DETAIL PANEL ────────────────────────────────────────────────────── -->
-  <div id="detail-panel">
+  <section class="chart-section" id="section-03">
     <div class="container">
-      <div class="section-label">⊙ Detail Panel — click a data point in Chart 01 to expand</div>
-      <p style="font-size:0.82rem; color:var(--text-dim); margin-bottom:1.5rem;">
-        Will show Male vs Female dumbbell chart for the selected year + dimension.
-      </p>
-      <div class="detail-placeholder">
-        <span>[ M/F dumbbell chart — planned interaction ]</span>
+      <div class="chart-grid">
+
+        <!-- left: controls -->
+        <div class="chart-meta">
+          <div class="chart-number">03 / Age & Gender</div>
+          <h2 class="chart-title">Hospitalisation<br>by Age & Gender</h2>
+          <p class="chart-desc">
+            Male vs Female hospitalisations across age groups for the selected year.
+            The gap between dots shows the gender disparity within each age group.
+          </p>
+
+          <div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:0.75rem;">
+            <div class="control-group">
+              <span class="control-label">Road Users</span>
+              <div class="toggle-btn">
+                <button class="db-filter-btn active" data-filter="all">All Road Users</button>
+                <button class="db-filter-btn" data-filter="moto">Motorcyclists</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="chart-03-legend" class="legend" style="margin-top:1.5rem; flex-direction:column; gap:0.5rem;">
+            <div class="legend-item">
+              <div class="legend-swatch" style="background:#009E73"></div>
+              <span>Male</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-swatch" style="background:#CC79A7"></div>
+              <span>Female</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- right: chart -->
+        <div>
+          <div class="section-label">⊙ Use the slider above to select a year</div>
+          <div class="chart-error">Failed to load data — open via a local server (not file://)</div>
+          <div id="chart-03-container"></div>
+        </div>
+
       </div>
     </div>
-  </div>
+  </section>
 
   <footer>
     <div class="container">
@@ -267,6 +301,7 @@
   <script src="js/per10k-line-chart.js"></script>
   <script src="js/choropleth.js"></script>
   <script src="js/donut-chart.js"></script>
+  <script src="js/dumbbell-chart.js"></script>
   <script src="js/load-data.js"></script>
 
   <script>
