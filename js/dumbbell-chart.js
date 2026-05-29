@@ -3,7 +3,7 @@ const DUMBBELL_COLORS = {
   female: "#CC79A7"
 };
 
-const AGE_ORDER = ["0-7", "8-16", "17-25", "26-39", "40-64", "65-74", "75+"];
+const AGE_ORDER = ["75+", "65-74", "40-64", "26-39", "17-25", "8-16", "0-7"];
 
 const drawDumbbellChart = (mainData) => {
 
