@@ -29,22 +29,21 @@ const drawDonutCharts = (stateData, vehicleData) => {
   function drawDonut(containerId, data, title) {
     const el = document.getElementById(containerId);
     if (!el) return;
-    el.innerHTML = "";
+    el.innerHTML = ""; // resets the draw donut container - GenAI was used for this
 
     const size   = 150;
     const radius = size / 2;
     const inner  = radius * 0.6;
     const total  = d3.sum(data, d => d.value);
 
-    const svg = d3.select(`#${containerId}`).append("svg")
+    const svg = d3.select(`#${containerId}`).append("svg") // GenAI was used for this
         .attr("viewBox", `0 0 ${size} ${size + 32}`)
         .attr("width", size)
         .attr("height", size + 32);
 
     const g = svg.append("g").attr("transform", `translate(${radius},${radius + 16})`);
 
-    // title
-    svg.append("text")
+    svg.append("text") // title
       .attr("x", radius).attr("y", 11)
       .attr("text-anchor", "middle")
       .attr("fill", "rgba(255,255,255,0.45)")
@@ -54,20 +53,19 @@ const drawDonutCharts = (stateData, vehicleData) => {
       .style("letter-spacing", "0.08em")
       .text(title);
 
-    const pie   = d3.pie().value(d => d.value).sort(null);
-    const arc   = d3.arc().innerRadius(inner).outerRadius(radius - 2);
+    const pie = d3.pie().value(d => d.value).sort(null);
+    const arc = d3.arc().innerRadius(inner).outerRadius(radius - 2);
 
-    g.selectAll("path").data(pie(data)).join("path")
+    g.selectAll("path").data(pie(data)).join("path") // makes the donut
       .attr("d", arc)
       .attr("fill", d => d.data.color)
       .attr("stroke", "#111")
       .attr("stroke-width", 1.5);
 
-    // centre percentage
     const moto = data[0];
     const pct  = total > 0 ? ((moto.value / total) * 100).toFixed(1) : "0";
 
-    g.append("text")
+    g.append("text") // percentage text
       .attr("text-anchor", "middle").attr("dy", "-0.1em")
       .attr("fill", PER10K_COLORS.motorcycle)
       .style("font-size", "16px")
@@ -75,7 +73,7 @@ const drawDonutCharts = (stateData, vehicleData) => {
       .style("font-family", "'JetBrains Mono', monospace")
       .text(`${pct}%`);
 
-    g.append("text")
+    g.append("text") // text inside donut
       .attr("text-anchor", "middle").attr("dy", "1.1em")
       .attr("fill", "rgba(255,255,255,0.3)")
       .style("font-size", "7.5px")
@@ -84,10 +82,10 @@ const drawDonutCharts = (stateData, vehicleData) => {
   }
 
   function update() {
-    if (!currentState) return;
+    if (!currentState) return; // if no state selected don't run
     const data = getStateData(currentState, currentYear);
-    drawDonut("donut-vehicle", data.vehicles, "Registered Vehicles");
-    drawDonut("donut-hosp",    data.hosps,    "Hospitalisations");
+    drawDonut("donut-vehicle", data.vehicles, "Registered Vehicles"); // draws the first donut
+    drawDonut("donut-hosp",    data.hosps,    "Hospitalisations"); // draws the second donut
   }
 
   // ── event listeners ──
@@ -99,21 +97,14 @@ const drawDonutCharts = (stateData, vehicleData) => {
   document.addEventListener("stateClick", e => {
     currentState = e.detail.state;
 
-    if (currentState) {
-      document.getElementById("choropleth-default").style.display      = "none";
+    if (currentState) { // if a state is selected
+      document.getElementById("choropleth-default").style.display      = "none"; // shows donut charts
       document.getElementById("choropleth-state-detail").style.display = "block";
       document.getElementById("selected-state-name").textContent       = currentState;
       update();
     } else {
-      document.getElementById("choropleth-default").style.display      = "block";
+      document.getElementById("choropleth-default").style.display      = "block"; // return default text
       document.getElementById("choropleth-state-detail").style.display = "none";
     }
   });
-
-  // ── clear button ──
-  document.getElementById("choropleth-reset-btn").addEventListener("click", () => {
-    currentState = null;
-    document.dispatchEvent(new CustomEvent("stateClick", { detail: { state: null } }));
-  });
-
 };

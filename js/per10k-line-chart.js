@@ -1,4 +1,4 @@
-const STATE_TO_COL = {
+const STATE_TO_COL = { // match state names together
   NSW: "nsw", Vic: "vic", Qld: "qld",
   SA: "sa", WA: "wa", Tas: "tas", NT: "nt", ACT: "act"
 };
@@ -11,7 +11,7 @@ const PER10K_COLORS = {
 const drawPer10kChart = (stateData, vehicleData) => {
 
   // ── national aggregates per year ──
-  const years = [...new Set(stateData.map(d => d.year))].sort();
+  const years = [...new Set(stateData.map(d => d.year))].sort(); // create a sorted array for the years
 
   const motoVehicles  = vehicleData.filter(d => d.type === "Motorcycles");
   const totalVehicles = vehicleData.filter(d => d.type === "Total");
@@ -19,113 +19,113 @@ const drawPer10kChart = (stateData, vehicleData) => {
   function nationalLine() {
     return years.map(year => {
       const rows      = stateData.filter(d => d.year === year);
-      const mHosp     = d3.sum(rows, d => d.mhospitalisations);
+      const mHosp     = d3.sum(rows, d => d.mhospitalisations); 
       const tHosp     = d3.sum(rows, d => d.thospitalisations);
-      const mVeh      = motoVehicles.find(d => d.year === year)?.aus;
-      const tVeh      = totalVehicles.find(d => d.year === year)?.aus;
+      const mVeh      = motoVehicles.find(d => d.year === year)?.aus; // only select years with motorcycle
+      const tVeh      = totalVehicles.find(d => d.year === year)?.aus; // only select years with total
       return {
         year,
-        motorcycle:    (mHosp / mVeh) * 10000,
-        nonMotorcycle: ((tHosp - mHosp) / (tVeh - mVeh)) * 10000
+        motorcycle:    (mHosp / mVeh) * 10000, // to calculate per 10,000 motorcycle hospitalisations
+        nonMotorcycle: ((tHosp - mHosp) / (tVeh - mVeh)) * 10000 // to calculate per 10,000 total vehicle hospitalisations
       };
     });
   }
 
   function stateLine(state) {
-    const col = STATE_TO_COL[state];
+    const col = STATE_TO_COL[state]; // turn each state into a column
     return years.map(year => {
-        const row   = stateData.find(d => d.year === year && d.state === state);
-        const mVeh  = motoVehicles.find(d => d.year === year)?.[col];
-        const tVeh  = totalVehicles.find(d => d.year === year)?.[col];
+        const row   = stateData.find(d => d.year === year && d.state === state); // finds matching row for year and state
+        const mVeh  = motoVehicles.find(d => d.year === year)?.[col]; // gets registered motorcycles
+        const tVeh  = totalVehicles.find(d => d.year === year)?.[col]; // gets registered vehicles
         return {
           year,
           motorcycle:    row && mVeh ? (row.mhospitalisations / mVeh) * 10000 : null,
           nonMotorcycle: row && tVeh && mVeh ? ((row.thospitalisations - row.mhospitalisations) / (tVeh - mVeh)) * 10000 : null
         };
     });
-}
+  }
 
-const margin = { top: 24, right: 24, bottom: 48, left: 62 };
-const totalHeight = 420;
+  const margin = { top: 24, right: 24, bottom: 48, left: 62 };
+  const totalHeight = 420;
 
-const container = d3.select("#chart-per10k-container");
-const totalWidth = container.node().getBoundingClientRect().width || 700;
-const W = totalWidth - margin.left - margin.right;
-const H = totalHeight - margin.top - margin.bottom;
+  const container = d3.select("#chart-per10k-container");
+  const totalWidth = container.node().getBoundingClientRect().width || 700; // uses the width of the screen to scale
+  const W = totalWidth - margin.left - margin.right;
+  const H = totalHeight - margin.top - margin.bottom;
 
-const svg = container.append("svg")
-  .attr("viewBox", `0 0 ${totalWidth} ${totalHeight}`)
-  .attr("width", "100%")
-  .style("display", "block");
+  const svg = container.append("svg")
+    .attr("viewBox", `0 0 ${totalWidth} ${totalHeight}`)
+    .attr("width", "100%")
+    .style("display", "block");
 
-svg.append("defs").append("clipPath")
-  .attr("id", "per10k-clip")
-  .append("rect")
-  .attr("x", 0).attr("y", -margin.top)
-  .attr("width", W + 1).attr("height", totalHeight);
+  svg.append("defs").append("clipPath") // sets where the chart will draw things
+    .attr("id", "per10k-clip")
+    .append("rect")
+    .attr("x", 0).attr("y", -margin.top)
+    .attr("width", W + 1).attr("height", totalHeight);
 
-const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-const xScale = d3.scaleLinear().domain([2011, 2021]).range([0, W]);
-const yScale = d3.scaleLinear().range([H, 0]);
+  const xScale = d3.scaleLinear().domain([2011, 2021]).range([0, W]);
+  const yScale = d3.scaleLinear().range([H, 0]);
 
-const xAxisG = g.append("g").attr("transform", `translate(0,${H})`);
-const yAxisG = g.append("g");
+  const xAxisG = g.append("g").attr("transform", `translate(0,${H})`);
+  const yAxisG = g.append("g");
 
-const styleAxis = sel => {
-  sel.select(".domain").attr("stroke", "rgba(255,255,255,0.12)");
-  sel.selectAll(".tick line").attr("stroke", "rgba(255,255,255,0.12)");
-  sel.selectAll(".tick text").attr("fill", "rgba(255,255,255,0.45)").style("font-size", "11px").style("font-family", "'JetBrains Mono', monospace");
-};
+  const styleAxis = sel => { // to draw lines of the chart
+    sel.select(".domain").attr("stroke", "rgba(255,255,255,0.12)"); // axis lines
+    sel.selectAll(".tick line").attr("stroke", "rgba(255,255,255,0.12)"); // notches on x axis
+    sel.selectAll(".tick text").attr("fill", "rgba(255,255,255,0.45)").style("font-size", "11px").style("font-family", "'JetBrains Mono', monospace"); // tick text
+  };
 
-g.append("text").attr("class", "axis-label")
+  g.append("text").attr("class", "axis-label") // adds the year text
     .attr("x", W / 2).attr("y", H + 40)
     .attr("text-anchor", "middle")
     .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "11px")
     .text("Year");
 
-g.append("text").attr("class", "axis-label")
+  g.append("text").attr("class", "axis-label") // adds the hospitalisations text
     .attr("transform", "rotate(-90)")
     .attr("x", -(H / 2)).attr("y", -50)
     .attr("text-anchor", "middle")
     .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "11px")
     .text("Hospitalisations per 10,000 Vehicles");
 
-const gridG  = g.append("g").attr("class", "grid-lines").lower();
-const linesG = g.append("g").attr("clip-path", "url(#per10k-clip)");
-const dotsG  = g.append("g").attr("clip-path", "url(#per10k-clip)");
+  const gridG  = g.append("g").attr("class", "grid-lines").lower();
+  const linesG = g.append("g").attr("clip-path", "url(#per10k-clip)");
+  const dotsG  = g.append("g").attr("clip-path", "url(#per10k-clip)");
 
-const tooltip = d3.select("body").append("div").attr("class", "tooltip").style("display", "none").style("position", "fixed");
+  const tooltip = d3.select("body").append("div").attr("class", "tooltip").style("display", "none").style("position", "fixed");
 
-let currentYear  = 2021;
-let currentState = null;
+  let currentYear  = 2021;
+  let currentState = null;
 
-function update() {
+  function update() { // main area that draws the actual lines for the chart
     const national = nationalLine();
-    const visible  = national.filter(d => d.year <= currentYear);
+    const visible  = national.filter(d => d.year <= currentYear); // filter to hide years not selected
 
-    const stateValues = currentState ? stateLine(currentState)
-            .filter(d => d.year <= currentYear)
-        .flatMap(d => [d.motorcycle, d.nonMotorcycle].filter(v => v !== null)) : [];
+    const stateValues = currentState ? stateLine(currentState) // if state is selected 
+      .filter(d => d.year <= currentYear)
+      .flatMap(d => [d.motorcycle, d.nonMotorcycle].filter(v => v !== null)) : [];
 
-    const allValues = [...visible.flatMap(d => [d.motorcycle, d.nonMotorcycle]), ...stateValues];
+    const allValues = [...visible.flatMap(d => [d.motorcycle, d.nonMotorcycle]), ...stateValues]; // creates the array for all the values
     
-    yScale.domain([0, d3.max(allValues) * 1.12]);
+    yScale.domain([0, d3.max(allValues) * 1.12]); // scales the y axis
 
     // ── axes ──
     xAxisG.transition().duration(400)
-      .call(d3.axisBottom(xScale).tickFormat(d3.format("d")).ticks(11));
-    yAxisG.transition().duration(400)
-      .call(d3.axisLeft(yScale).ticks(6));
-    styleAxis(xAxisG); styleAxis(yAxisG);
+      .call(d3.axisBottom(xScale).tickFormat(d3.format("d")).ticks(11)); // ticks for bottom axis
+    yAxisG.transition().duration(400) // for when y axis needs to be rescaled
+      .call(d3.axisLeft(yScale).ticks(6)); // ticks for left axis
+    styleAxis(xAxisG); styleAxis(yAxisG); // draws the axis
 
     // ── grid ──
-    gridG.selectAll("line").data(yScale.ticks(6)).join("line")
+    gridG.selectAll("line").data(yScale.ticks(6)).join("line") // creates the horizontal lines
       .attr("x1", 0).attr("x2", W)
       .attr("y1", d => yScale(d)).attr("y2", d => yScale(d))
       .attr("stroke", "rgba(255,255,255,0.05)").attr("stroke-width", 1);
 
-    const lineGen = d3.line().x(d => xScale(d.year)).curve(d3.curveMonotoneX);
+    const lineGen = d3.line().x(d => xScale(d.year)).curve(d3.curveMonotoneX); // line generator
 
     // ── national motorcycle line ──
     linesG.selectAll("path.per10k-moto").data([visible]).join("path")
@@ -148,10 +148,10 @@ function update() {
       .attr("d", lineGen.y(d => yScale(d.nonMotorcycle)));
 
     // ── state dotted overlay ──
-    if (currentState) {
-      const stateFiltered = stateLine(currentState).filter(d => d.year <= currentYear);
-      const stateMoto    = stateFiltered.filter(d => d.motorcycle !== null);
-      const stateNonMoto = stateFiltered.filter(d => d.nonMotorcycle !== null);
+    if (currentState) { // if a state is selected
+      const stateFiltered = stateLine(currentState).filter(d => d.year <= currentYear); // filters for year
+      const stateMoto    = stateFiltered.filter(d => d.motorcycle !== null); // filters for state
+      const stateNonMoto = stateFiltered.filter(d => d.nonMotorcycle !== null); // filters for state
 
       // ── state motorcycle line ──
       linesG.selectAll("path.per10k-state").data([stateMoto]).join("path")
@@ -182,13 +182,13 @@ function update() {
         update => update,
         exit => exit.remove()
       )
-      .on("mouseover", (event, d) => {
+      .on("mouseover", (event, d) => { // hover effect
         tooltip.style("display", "block")
-          .style("left", (event.clientX + 14) + "px").style("top", (event.clientY - 30) + "px")
-          .html(`<strong style="color:${PER10K_COLORS.motorcycle}">${currentState} Motorcyclists</strong><br>${d.year} &nbsp; ${d.motorcycle.toFixed(1)} per 10,000 vehicles`);
+          .style("left", (event.clientX + 14) + "px").style("top", (event.clientY - 30) + "px") // where hover box is displayed
+          .html(`<strong style="color:${PER10K_COLORS.motorcycle}">${currentState} Motorcyclists</strong><br>${d.year} &nbsp; ${d.motorcycle.toFixed(1)} per 10,000 vehicles`); // actual hover box itself
       })
       .on("mouseleave", () => tooltip.style("display", "none"))
-      .transition().duration(400)
+      .transition().duration(400) // for when year filter is changed
         .attr("r", d => d.year === currentYear ? 5 : 3)
         .attr("cx", d => xScale(d.year))
         .attr("cy", d => yScale(d.motorcycle))
@@ -245,21 +245,21 @@ function update() {
         .attr("cy", d => yScale(d[key]))
         .attr("fill", PER10K_COLORS[key]);
     });
-}
+  }
 
-  document.addEventListener("yearChange", e => {
+  document.addEventListener("yearChange", e => { // checking if year filter is changed
     currentYear = e.detail.year;
     update();
   });
 
-  document.addEventListener("stateClick", e => {
+  document.addEventListener("stateClick", e => { // checking if a state is selected
     currentState = e.detail.state;
     update();
   });
 
   update();
 
-  // ── legend ──
+  // ── legend (made with GenAI) ──
     const legendEl = document.getElementById("chart-per10k-legend");
     if (legendEl) {
       legendEl.innerHTML = `

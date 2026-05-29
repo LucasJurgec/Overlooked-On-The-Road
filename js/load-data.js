@@ -1,3 +1,5 @@
+// no ai used in this file
+
 Promise.all([
   d3.csv("data/main.csv", d => ({
     year:             +d["Calendar year"],

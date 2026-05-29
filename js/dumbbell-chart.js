@@ -37,13 +37,13 @@ const drawDumbbellChart = (mainData) => {
     sel.selectAll(".tick text").attr("fill", "rgba(255,255,255,0.45)").style("font-size", "11px").style("font-family", "'JetBrains Mono', monospace");
   };
 
-  g.append("text")
+  g.append("text") // y axis text
     .attr("x", W / 2).attr("y", H + 40)
     .attr("text-anchor", "middle")
     .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "11px")
     .text("Hospitalisations");
 
-  g.append("text")
+  g.append("text") // x axis text
     .attr("transform", "rotate(-90)")
     .attr("x", -(H / 2)).attr("y", -60)
     .attr("text-anchor", "middle")
@@ -84,13 +84,12 @@ const drawDumbbellChart = (mainData) => {
       .call(d3.axisLeft(yScale));
     styleAxis(xAxisG); styleAxis(yAxisG);
 
-    // ── grid ──
-    gridG.selectAll("line").data(xScale.ticks(6)).join("line")
+    gridG.selectAll("line").data(xScale.ticks(6)).join("line") // horizontal line for chart
       .attr("x1", d => xScale(d)).attr("x2", d => xScale(d))
       .attr("y1", 0).attr("y2", H)
       .attr("stroke", "rgba(255,255,255,0.05)").attr("stroke-width", 1);
 
-    // ── connecting lines ──
+    // ── connecting lines (GenAi was used for this) ──
     linesG.selectAll("line.db-line").data(data, d => d.age).join(
       enter => enter.append("line").attr("class", "db-line")
         .attr("y1", d => yScale(d.age) + yScale.bandwidth() / 2)
@@ -106,7 +105,7 @@ const drawDumbbellChart = (mainData) => {
       .attr("stroke", "rgba(255,255,255,0.15)")
       .attr("stroke-width", 2);
 
-    // ── male dots ──
+    // ── male dots (GenAI helped create this) ──
     dotsG.selectAll("circle.db-male").data(data, d => d.age).join(
       enter => enter.append("circle").attr("class", "db-male")
         .attr("r", 7).attr("cy", d => yScale(d.age) + yScale.bandwidth() / 2),
@@ -152,9 +151,9 @@ const drawDumbbellChart = (mainData) => {
   });
 
   document.querySelectorAll(".db-filter-btn").forEach(btn => {
-    btn.addEventListener("click", function() {
-      document.querySelectorAll(".db-filter-btn").forEach(b => b.classList.remove("active"));
-      this.classList.add("active");
+    btn.addEventListener("click", function() { // checks is a button is selected
+      document.querySelectorAll(".db-filter-btn").forEach(b => b.classList.remove("active")); // unactivates button
+      this.classList.add("active"); // activates button
       currentFilter = this.dataset.filter;
       update();
     });
