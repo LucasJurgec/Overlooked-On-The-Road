@@ -31,6 +31,7 @@ Promise.all([
   drawLineChart(main, registered);
   drawChoropleth(state, geo);
   drawPer10kChart(state, registered);
+  drawDonutCharts(state, registered);
 }).catch(err => {
   console.error("Data load failed:", err);
   document.querySelectorAll(".chart-error").forEach(el => {

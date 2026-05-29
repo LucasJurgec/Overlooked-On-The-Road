@@ -186,23 +186,39 @@
         <div class="chart-meta">
           <div class="chart-number">02 / State Comparison</div>
           <h2 class="chart-title">Hospitalisations<br>by State</h2>
-          <p class="chart-desc">
-            Total hospitalisations per state for the selected year. Use the shared
-            year slider to animate. Click a state to highlight it.
-          </p>
 
-          <p style="margin-top:1rem; font-size:0.73rem; color:var(--text-muted); font-family:var(--font-mono); line-height:1.6;">
-            ⚠ Raw counts — not population-<br>normalised. NSW + QLD dominate<br>due to population size.
-          </p>
-
-          <div style="margin-top:1.75rem;">
-            <span class="control-label">Colour scale</span>
-            <div style="margin-top:0.4rem; display:flex; align-items:center; gap:0.5rem;">
-              <span style="font-size:0.68rem; color:var(--text-muted); font-family:var(--font-mono);">Low</span>
-              <div style="flex:1; height:8px; border-radius:1px; background:linear-gradient(to right, #1e1e1e, #e07a2a);"></div>
-              <span style="font-size:0.68rem; color:var(--text-muted); font-family:var(--font-mono);">High</span>
+          <!-- default view — shown when no state selected -->
+          <div id="choropleth-default">
+            <p class="chart-desc">
+              Total hospitalisations per state for the selected year. Use the shared
+              year slider to animate. Click a state to see its motorcycle breakdown.
+            </p>
+            <p style="margin-top:1rem; font-size:0.73rem; color:var(--text-muted); font-family:var(--font-mono); line-height:1.6;">
+              ⚠ Raw counts — not population-<br>normalised. NSW + QLD dominate<br>due to population size.
+            </p>
+            <div style="margin-top:1.75rem;">
+              <span class="control-label">Colour scale</span>
+              <div style="margin-top:0.4rem; display:flex; align-items:center; gap:0.5rem;">
+                <span style="font-size:0.68rem; color:var(--text-muted); font-family:var(--font-mono);">Low</span>
+                <div style="flex:1; height:8px; border-radius:1px; background:linear-gradient(to right, #1e1e1e, #e07a2a);"></div>
+                <span style="font-size:0.68rem; color:var(--text-muted); font-family:var(--font-mono);">High</span>
+              </div>
             </div>
           </div>
+
+          <!-- state detail view — shown when a state is clicked -->
+          <div id="choropleth-state-detail" style="display:none;">
+            <div style="margin-bottom:1rem;">
+              <span id="selected-state-name" style="font-size:0.85rem; font-weight:700; color:var(--accent); font-family:var(--font-mono);"></span>
+              <button id="choropleth-reset-btn" style="margin-left:0.75rem; font-size:0.68rem; color:var(--text-muted); font-family:var(--font-mono); background:none; border:1px solid var(--border); padding:0.2rem 0.5rem; cursor:pointer; border-radius:2px;">✕ clear</button>
+            </div>
+            <p style="font-size:0.72rem; color:var(--text-dim); margin-bottom:1rem; line-height:1.5;">
+              Motorcycle share of vehicles vs hospitalisations for the selected year.
+            </p>
+            <div id="donut-vehicle" style="margin-bottom:1.5rem;"></div>
+            <div id="donut-hosp"></div>
+          </div>
+
         </div>
 
         <!-- right: map -->
@@ -250,6 +266,7 @@
   <script src="js/line-chart.js"></script>
   <script src="js/per10k-line-chart.js"></script>
   <script src="js/choropleth.js"></script>
+  <script src="js/donut-chart.js"></script>
   <script src="js/load-data.js"></script>
 
   <script>
