@@ -112,7 +112,7 @@ const drawChoropleth = (stateData, geo) => {
 
       paths.attr("stroke", "rgba(255,255,255,0.15)").attr("stroke-width", 0.8);
       if (selectedState) {
-        d3.select(event.currentTarget).attr("stroke", "#e07a2a").attr("stroke-width", 2.5);
+        d3.select(event.currentTarget).attr("stroke", "#ffffff").attr("stroke-width", 2.5);
       }
 
       document.dispatchEvent(new CustomEvent("stateClick", {
