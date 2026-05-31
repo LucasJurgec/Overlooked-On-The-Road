@@ -44,13 +44,13 @@ const drawDonutCharts = (stateData, vehicleData) => {
     const g = svg.append("g").attr("transform", `translate(${radius},${radius + 16})`);
 
     svg.append("text") // title
-      .attr("x", radius).attr("y", 11)
+      .attr("x", radius).attr("y", 13)
       .attr("text-anchor", "middle")
-      .attr("fill", "rgba(255,255,255,0.45)")
-      .style("font-size", "9px")
-      .style("font-family", "'JetBrains Mono', monospace")
-      .style("text-transform", "uppercase")
-      .style("letter-spacing", "0.08em")
+      .attr("fill", "rgba(255,255,255,0.5)")
+      .style("font-size", "12px")
+      .style("font-family", "var(--font-sans)")
+      .style("font-weight", "600")
+      .style("letter-spacing", "0.04em")
       .text(title);
 
     const pie = d3.pie().value(d => d.value).sort(null);
@@ -68,17 +68,17 @@ const drawDonutCharts = (stateData, vehicleData) => {
     g.append("text") // percentage text
       .attr("text-anchor", "middle").attr("dy", "-0.1em")
       .attr("fill", PER10K_COLORS.motorcycle)
-      .style("font-size", "16px")
+      .style("font-size", "22px")
       .style("font-weight", "700")
-      .style("font-family", "'JetBrains Mono', monospace")
+      .style("font-family", "var(--font-mono)")
       .text(`${pct}%`);
 
     g.append("text") // text inside donut
-      .attr("text-anchor", "middle").attr("dy", "1.1em")
-      .attr("fill", "rgba(255,255,255,0.3)")
-      .style("font-size", "7.5px")
-      .style("font-family", "'JetBrains Mono', monospace")
-      .text("motorcycle share");
+      .attr("text-anchor", "middle").attr("dy", "1.2em")
+      .attr("fill", "rgba(255,255,255,0.4)")
+      .style("font-size", "12px")
+      .style("font-family", "var(--font-sans)")
+      .text("moto share");
   }
 
   function update() {

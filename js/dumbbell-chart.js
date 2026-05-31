@@ -34,20 +34,20 @@ const drawDumbbellChart = (mainData) => {
   const styleAxis = sel => {
     sel.select(".domain").attr("stroke", "rgba(255,255,255,0.12)");
     sel.selectAll(".tick line").attr("stroke", "rgba(255,255,255,0.12)");
-    sel.selectAll(".tick text").attr("fill", "rgba(255,255,255,0.45)").style("font-size", "11px").style("font-family", "'JetBrains Mono', monospace");
+    sel.selectAll(".tick text").attr("fill", "rgba(255,255,255,0.45)").style("font-size", "12px").style("font-family", "var(--font-mono)");
   };
 
   g.append("text") // y axis text
     .attr("x", W / 2).attr("y", H + 40)
     .attr("text-anchor", "middle")
-    .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "11px")
+    .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "12px").style("font-family", "var(--font-sans)")
     .text("Hospitalisations");
 
   g.append("text") // x axis text
     .attr("transform", "rotate(-90)")
     .attr("x", -(H / 2)).attr("y", -60)
     .attr("text-anchor", "middle")
-    .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "11px")
+    .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "12px").style("font-family", "var(--font-sans)")
     .text("Age Group");
 
   const gridG    = g.append("g").attr("class", "grid-lines");

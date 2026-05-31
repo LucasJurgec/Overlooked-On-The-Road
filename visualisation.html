@@ -193,9 +193,7 @@
               Total hospitalisations per state for the selected year. Use the shared
               year slider to animate. Click a state to see its motorcycle breakdown.
             </p>
-            <p style="margin-top:1rem; font-size:0.73rem; color:var(--text-muted); font-family:var(--font-mono); line-height:1.6;">
-              ⚠ Raw counts — not population-<br>normalised. NSW + QLD dominate<br>due to population size.
-            </p>
+            <p class="data-caveat">Raw counts — not population-normalised. NSW + QLD dominate due to population size.</p>
             <div style="margin-top:1.75rem;">
               <span class="control-label">Colour scale</span>
               <div style="margin-top:0.4rem; display:flex; align-items:center; gap:0.5rem;">
@@ -208,13 +206,13 @@
 
           <!-- state detail view — shown when a state is clicked -->
           <div id="choropleth-state-detail" style="display:none;">
-            <div style="margin-bottom:1rem;">
-              <span id="selected-state-name" style="font-size:0.85rem; font-weight:700; color:var(--accent); font-family:var(--font-mono);"></span>
+            <div style="margin-bottom:0.5rem;">
+              <span id="selected-state-name" style="font-size:var(--fs-sm); font-weight:700; color:var(--accent); font-family:var(--font-mono);"></span>
             </div>
-            <p style="font-size:0.72rem; color:var(--text-dim); margin-bottom:1rem; line-height:1.5;">
+            <p style="font-size:var(--fs-sm); color:var(--text-dim); margin-bottom:1rem; line-height:1.5;">
               Motorcycle share of vehicles vs hospitalisations for the selected year.
             </p>
-            <div id="donut-vehicle" style="margin-bottom:1.5rem;"></div>
+            <div id="donut-vehicle" style="margin-bottom:1rem;"></div>
             <div id="donut-hosp"></div>
           </div>
 

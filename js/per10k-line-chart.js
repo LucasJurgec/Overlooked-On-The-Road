@@ -75,20 +75,20 @@ const drawPer10kChart = (stateData, vehicleData) => {
   const styleAxis = sel => { // to draw lines of the chart
     sel.select(".domain").attr("stroke", "rgba(255,255,255,0.12)"); // axis lines
     sel.selectAll(".tick line").attr("stroke", "rgba(255,255,255,0.12)"); // notches on x axis
-    sel.selectAll(".tick text").attr("fill", "rgba(255,255,255,0.45)").style("font-size", "11px").style("font-family", "'JetBrains Mono', monospace"); // tick text
+    sel.selectAll(".tick text").attr("fill", "rgba(255,255,255,0.45)").style("font-size", "12px").style("font-family", "var(--font-mono)"); // tick text
   };
 
   g.append("text").attr("class", "axis-label") // adds the year text
     .attr("x", W / 2).attr("y", H + 40)
     .attr("text-anchor", "middle")
-    .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "11px")
+    .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "12px").style("font-family", "var(--font-sans)")
     .text("Year");
 
   g.append("text").attr("class", "axis-label") // adds the hospitalisations text
     .attr("transform", "rotate(-90)")
     .attr("x", -(H / 2)).attr("y", -50)
     .attr("text-anchor", "middle")
-    .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "11px")
+    .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "12px").style("font-family", "var(--font-sans)")
     .text("Hospitalisations per 10,000 Vehicles");
 
   const gridG  = g.append("g").attr("class", "grid-lines").lower();
@@ -142,7 +142,7 @@ const drawPer10kChart = (stateData, vehicleData) => {
       .attr("class", "per10k-nonmoto")
       .attr("fill", "none")
       .attr("stroke", PER10K_COLORS.nonMotorcycle)
-      .attr("stroke-width", 3)
+      .attr("stroke-width", 2)
       .attr("stroke-linecap", "round")
       .transition().duration(500)
       .attr("d", lineGen.y(d => yScale(d.nonMotorcycle)));

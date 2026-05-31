@@ -70,7 +70,7 @@ const drawChoropleth = (stateData, geo) => {
     .attr("transform", d => `translate(${pathGen.centroid(d)})`)
     .attr("text-anchor", "middle").attr("dy", "0.35em")
     .attr("fill", "rgba(255,255,255,0.55)")
-    .style("font-size", "10px").style("font-family", "'JetBrains Mono', monospace")
+    .style("font-size", "12px").style("font-family", "var(--font-mono)")
     .style("pointer-events", "none")
     .text(d => csvCode(d));
 
@@ -89,11 +89,11 @@ const drawChoropleth = (stateData, geo) => {
     .attr("width", legendW).attr("height", legendH)
     .attr("fill", "url(#choro-grad)").attr("rx", 1);
   svg.append("text").attr("x", legendX).attr("y", legendY - 5)
-    .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "9px").style("font-family", "monospace")
+    .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "12px").style("font-family", "var(--font-mono)")
     .text("Low");
   svg.append("text").attr("x", legendX + legendW).attr("y", legendY - 5)
     .attr("text-anchor", "end")
-    .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "9px").style("font-family", "monospace")
+    .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "12px").style("font-family", "var(--font-mono)")
     .text("High");
 
   // ── interactions ──────────────────────────────────────────────────────────────
