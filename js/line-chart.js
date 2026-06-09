@@ -36,11 +36,14 @@ const EXCLUDE = new Set(["Intersex or indeterminate or missing", "intersex or in
 
 // ─── MAIN DRAW FUNCTION ────────────────────────────────────────────────────────
 const drawLineChart = (main, registered) => {
-  const margin = { top: 24, right: 24, bottom: 48, left: 62 };
+  const margin = { top: 24, right: 24, bottom: 48, left: 76 };
   const totalHeight = 420;
 
   const container = d3.select("#chart-01-container");
-  const totalWidth = container.node().getBoundingClientRect().width || 700;
+  // container starts display:none so its own width is 0 — use the parent column instead
+  const totalWidth = container.node().getBoundingClientRect().width
+    || container.node().parentElement.getBoundingClientRect().width
+    || 700;
   const W = totalWidth - margin.left - margin.right;
   const H = totalHeight - margin.top - margin.bottom;
 
@@ -81,26 +84,45 @@ const drawLineChart = (main, registered) => {
 
   const yLabel = g.append("text").attr("class", "axis-label")
     .attr("transform", "rotate(-90)")
-    .attr("x", -(H / 2)).attr("y", -50)
+    .attr("x", -(H / 2)).attr("y", -62)
     .attr("text-anchor", "middle")
     .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "12px").style("font-family", "var(--font-sans)");
 
   // ── grid lines group ──
-  const gridG = g.append("g").attr("class", "grid-lines").lower();
+  const gridG  = g.append("g").attr("class", "grid-lines").lower();
+  const breakG = g.append("g").attr("class", "break-annotations");
 
   // ── line / dot layers (clipped) ──
   const linesG = g.append("g").attr("clip-path", "url(#lc-clip)");
   const dotsG  = g.append("g").attr("clip-path", "url(#lc-clip)");
 
+  // VIC changed hospital admission counting methodology in 2012; NSW in 2017.
+  [
+    { year: 2012, label: "VIC series break", pct: "−13% statewide" },
+    { year: 2017, label: "NSW series break", pct: "−11% statewide" }
+  ].forEach(({ year, label, pct }) => {
+    const x = xScale(year);
+    breakG.append("line")
+      .attr("x1", x).attr("x2", x)
+      .attr("y1", 0).attr("y2", H)
+      .attr("stroke", "rgba(255,255,255,0.2)")
+      .attr("stroke-width", 1)
+      .attr("stroke-dasharray", "4 3");
+    const [state, ...rest] = label.split(" ");
+    breakG.append("text").attr("x", x + 4).attr("y", 4)
+      .attr("fill", "rgba(255,255,255,0.45)").style("font-size", "12px").style("font-family", "var(--font-mono)")
+      .text(state);
+    breakG.append("text").attr("x", x + 4).attr("y", 18)
+      .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "11px").style("font-family", "var(--font-mono)")
+      .text(rest.join(" "));
+    breakG.append("text").attr("x", x + 4).attr("y", 31)
+      .attr("fill", "rgba(213,94,0,0.7)").style("font-size", "10px").style("font-family", "var(--font-mono)")
+      .text(pct);
+  });
+
   // ── tooltip ──
   const tooltip = d3.select("body").append("div").attr("class", "tooltip").style("display", "none").style("position", "fixed");
 
-  // ── state filter label ──
-  const stateLabel = g.append("text").attr("class", "state-filter-label")
-    .attr("x", W).attr("y", -8).attr("text-anchor", "end")
-    .attr("fill", "#e07a2a").style("font-size", "12px")
-    .style("font-family", "var(--font-mono)")
-    .text("");
 
   let currentDim  = "Road User Type";
   let currentYear = 2021;
@@ -156,19 +178,22 @@ const drawLineChart = (main, registered) => {
     const lineGen = d3.line().x(d => xScale(d.year)).y(d => yScale(getValue(d))).curve(d3.curveMonotoneX);
 
     // ── lines ──
-    linesG.selectAll("path.lc-line").data(cats, d => d).join(
+    // Split each category into segments so the line doesn't connect across series break years
+    const catSegs = cats.flatMap(cat => {
+      const pts = data.filter(d => d.cat === cat && d.year <= currentYear).sort((a,b) => a.year - b.year);
+      return makeSegments(pts).map((seg, si) => ({ cat, si, seg }));
+    });
+
+    linesG.selectAll("path.lc-line").data(catSegs, d => `${d.cat}-${d.si}`).join(
       enter => enter.append("path").attr("class", "lc-line")
         .attr("fill", "none").attr("stroke-linejoin", "round").attr("stroke-linecap", "round"),
       update => update,
       exit => exit.transition().duration(300).style("opacity", 0).remove()
     ).transition().duration(500)
-      .attr("stroke", d => COLORS[d] || "#888")
-      .attr("stroke-width", d => currentDim === "Road User Type" && d === "Motorcyclist" ? 3 : 2)
+      .attr("stroke", d => COLORS[d.cat] || "#888")
+      .attr("stroke-width", d => currentDim === "Road User Type" && d.cat === "Motorcyclist" ? 3 : 2)
       .style("opacity", 1)
-      .attr("d", cat => {
-        const pts = data.filter(d => d.cat === cat && d.year <= currentYear).sort((a,b) => a.year - b.year);
-        return lineGen(pts);
-      });
+      .attr("d", d => lineGen(d.seg));
 
     // ── end dots ──
     dotsG.selectAll("circle.lc-dot").data(
@@ -226,13 +251,7 @@ const drawLineChart = (main, registered) => {
     update();
   });
 
-  // TODO: cross-chart filter not yet implemented
-  // main.csv has no State column so clicking the choropleth cannot filter this chart
-  // plan: overlay selected state's motorcycle trend from state.csv as a dashed line
-  document.addEventListener("stateClick", e => {
-    stateFilter = e.detail.state;
-    stateLabel.text(stateFilter ? `State: ${stateFilter} (filter not yet implemented)` : "");
-  });
+  document.addEventListener("stateClick", e => { stateFilter = e.detail.state; });
 
   update();
 };

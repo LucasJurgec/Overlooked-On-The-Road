@@ -3,6 +3,21 @@ const STATE_TO_COL = { // match state names together
   SA: "sa", WA: "wa", Tas: "tas", NT: "nt", ACT: "act"
 };
 
+// VIC changed admission counting in 2012; NSW in 2017.
+// Lines are split into segments so no connecting segment crosses either break year.
+const SERIES_BREAKS = new Set([2012, 2017]);
+
+function makeSegments(pts) {
+  const segs = [];
+  let cur = [];
+  pts.forEach(d => {
+    if (SERIES_BREAKS.has(d.year) && cur.length) { segs.push(cur); cur = [d]; }
+    else cur.push(d);
+  });
+  if (cur.length) segs.push(cur);
+  return segs;
+}
+
 const PER10K_COLORS = {
     "motorcycle": "#D55E00",
     "nonMotorcycle": "#56B4E9"
@@ -92,8 +107,34 @@ const drawPer10kChart = (stateData, vehicleData) => {
     .text("Hospitalisations per 10,000 Vehicles");
 
   const gridG  = g.append("g").attr("class", "grid-lines").lower();
+  const breakG = g.append("g").attr("class", "break-annotations");
   const linesG = g.append("g").attr("clip-path", "url(#per10k-clip)");
   const dotsG  = g.append("g").attr("clip-path", "url(#per10k-clip)");
+
+  // VIC changed hospital admission counting methodology in 2012; NSW in 2017.
+  // These vertical markers prevent users from reading those step-drops as real trends.
+  [
+    { year: 2012, label: "VIC series break", pct: "−13% statewide" },
+    { year: 2017, label: "NSW series break", pct: "−11% statewide" }
+  ].forEach(({ year, label, pct }) => {
+    const x = xScale(year);
+    breakG.append("line")
+      .attr("x1", x).attr("x2", x)
+      .attr("y1", 0).attr("y2", H)
+      .attr("stroke", "rgba(255,255,255,0.2)")
+      .attr("stroke-width", 1)
+      .attr("stroke-dasharray", "4 3");
+    const [state, ...rest] = label.split(" ");
+    breakG.append("text").attr("x", x + 4).attr("y", 4)
+      .attr("fill", "rgba(255,255,255,0.45)").style("font-size", "12px").style("font-family", "var(--font-mono)")
+      .text(state);
+    breakG.append("text").attr("x", x + 4).attr("y", 18)
+      .attr("fill", "rgba(255,255,255,0.3)").style("font-size", "11px").style("font-family", "var(--font-mono)")
+      .text(rest.join(" "));
+    breakG.append("text").attr("x", x + 4).attr("y", 31)
+      .attr("fill", "rgba(213,94,0,0.7)").style("font-size", "10px").style("font-family", "var(--font-mono)")
+      .text(pct);
+  });
 
   const tooltip = d3.select("body").append("div").attr("class", "tooltip").style("display", "none").style("position", "fixed");
 
@@ -125,27 +166,27 @@ const drawPer10kChart = (stateData, vehicleData) => {
       .attr("y1", d => yScale(d)).attr("y2", d => yScale(d))
       .attr("stroke", "rgba(255,255,255,0.05)").attr("stroke-width", 1);
 
-    const lineGen = d3.line().x(d => xScale(d.year)).curve(d3.curveMonotoneX); // line generator
+    const motoLineGen    = d3.line().x(d => xScale(d.year)).y(d => yScale(d.motorcycle)).curve(d3.curveMonotoneX);
+    const nonMotoLineGen = d3.line().x(d => xScale(d.year)).y(d => yScale(d.nonMotorcycle)).curve(d3.curveMonotoneX);
+    const lineGen        = motoLineGen; // kept for state overlay lines below
 
-    // ── national motorcycle line ──
-    linesG.selectAll("path.per10k-moto").data([visible]).join("path")
-      .attr("class", "per10k-moto")
-      .attr("fill", "none")
-      .attr("stroke", PER10K_COLORS.motorcycle)
-      .attr("stroke-width", 3)
-      .attr("stroke-linecap", "round")
-      .transition().duration(500)
-      .attr("d", lineGen.y(d => yScale(d.motorcycle)));
+    const visSegs = makeSegments(visible);
+
+    // ── national motorcycle line (one path per segment so line breaks at series breaks) ──
+    linesG.selectAll("path.per10k-moto").data(visSegs, (_, i) => i).join(
+      enter => enter.append("path").attr("class", "per10k-moto").attr("fill", "none").attr("stroke-linecap", "round"),
+      update => update,
+      exit => exit.remove()
+    ).attr("stroke", PER10K_COLORS.motorcycle).attr("stroke-width", 3)
+      .transition().duration(500).attr("d", seg => motoLineGen(seg));
 
     // ── national non-motorcycle line ──
-    linesG.selectAll("path.per10k-nonmoto").data([visible]).join("path")
-      .attr("class", "per10k-nonmoto")
-      .attr("fill", "none")
-      .attr("stroke", PER10K_COLORS.nonMotorcycle)
-      .attr("stroke-width", 2)
-      .attr("stroke-linecap", "round")
-      .transition().duration(500)
-      .attr("d", lineGen.y(d => yScale(d.nonMotorcycle)));
+    linesG.selectAll("path.per10k-nonmoto").data(visSegs, (_, i) => i).join(
+      enter => enter.append("path").attr("class", "per10k-nonmoto").attr("fill", "none").attr("stroke-linecap", "round"),
+      update => update,
+      exit => exit.remove()
+    ).attr("stroke", PER10K_COLORS.nonMotorcycle).attr("stroke-width", 2)
+      .transition().duration(500).attr("d", seg => nonMotoLineGen(seg));
 
     // ── state dotted overlay ──
     if (currentState) { // if a state is selected
