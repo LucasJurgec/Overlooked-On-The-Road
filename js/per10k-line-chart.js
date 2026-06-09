@@ -1,3 +1,7 @@
+// Chart 01 (Per 10,000 Vehicles view) - compares motorcycle vs other road user hospitalisation rates normalised by registered vehicle counts.
+// When a state is clicked on the choropleth, dotted overlay lines for that state appear on top of the national lines.
+// Responds to yearChange (year slider) and stateClick (choropleth click) CustomEvents.
+
 const STATE_TO_COL = { // match state names together
   NSW: "nsw", Vic: "vic", Qld: "qld",
   SA: "sa", WA: "wa", Tas: "tas", NT: "nt", ACT: "act"

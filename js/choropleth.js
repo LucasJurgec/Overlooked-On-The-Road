@@ -1,3 +1,6 @@
+// Chart 02 - choropleth map showing total hospitalisations per state for the selected year.
+// Clicking a state fires a stateClick CustomEvent - this triggers the per-10k overlay and donut charts to update.
+
 // GeoJSON uses full state names; state.csv uses short codes (NSW, Vic, Qld, etc.)
 const GEO_TO_CSV = {
   "New South Wales":            "NSW",
@@ -26,6 +29,8 @@ const drawChoropleth = (stateData, geo) => {
   const pathGen = d3.geoPath().projection(projection);
 
   // ── pre-aggregate state × year → sum ────────────────────────────────────────
+  // rolls state.csv into a nested map: year → state → total hospitalisations
+  // looked up in getHosp() on every colour update and tooltip hover
   const byYearState = d3.rollup(
     stateData,
     v => d3.sum(v, d => d.mhospitalisations),
@@ -35,6 +40,7 @@ const drawChoropleth = (stateData, geo) => {
 
   const maxVal = d3.max(stateData, d => d.mhospitalisations);
 
+  // dark background colour to the accent orange - darker = fewer hospitalisations
   const colorScale = d3.scaleSequential()
     .domain([0, maxVal])
     .interpolator(d3.interpolate("#1e1e1e", "#e07a2a"));
@@ -108,13 +114,14 @@ const drawChoropleth = (stateData, geo) => {
     .on("mouseleave", () => tooltip.style("display", "none"))
     .on("click", (event, d) => {
       const code = csvCode(d);
-      selectedState = selectedState === code ? null : code;
+      selectedState = selectedState === code ? null : code; // clicking the same state again deselects it
 
       paths.attr("stroke", "rgba(255,255,255,0.15)").attr("stroke-width", 0.8);
       if (selectedState) {
-        d3.select(event.currentTarget).attr("stroke", "#ffffff").attr("stroke-width", 2.5);
+        d3.select(event.currentTarget).attr("stroke", "#ffffff").attr("stroke-width", 2.5); // highlight selected state
       }
 
+      // broadcasts selected state to per10k-line-chart.js (overlay lines) and donut-chart.js (detail panel)
       document.dispatchEvent(new CustomEvent("stateClick", {
         detail: { state: selectedState, year: currentYear }
       }));

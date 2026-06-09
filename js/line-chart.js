@@ -1,3 +1,8 @@
+// Chart 01 (Breakdown view) - multi-line trend chart for national hospitalisations by selected dimension.
+// Dimension options: Road User Type, Age Group, Sex, Remoteness.
+// Supports absolute count and % share toggle.
+// Lines are split at series break years (2012, 2017) using makeSegments() from per10k-line-chart.js.
+
 // ─── COLOUR PALETTE (Okabe-Ito, colourblind-safe on dark bg) ──────────────────
 const COLORS = {
   // Road user
@@ -24,6 +29,7 @@ const COLORS = {
   "Remote":       "#D55E00"
 };
 
+// maps dropdown label to the matching column name in main.csv
 const DIMENSION_FIELD = {
   "Road User Type": "user",
   "Age Group":      "age",
@@ -130,8 +136,10 @@ const drawLineChart = (main, registered) => {
   let stateFilter = null;
 
   // ─── aggregate data for chosen dimension ──────────────────────────────────
+  // d3.rollup groups main.csv rows by category then year, summing hospitalisations into a nested map.
+  // The nested map is then flattened into a flat array of { cat, year, hosp } objects for d3 to draw.
   function aggregate(dim) {
-    const field = DIMENSION_FIELD[dim];
+    const field = DIMENSION_FIELD[dim]; // get the csv column name for the chosen dimension
     const rows = [];
     d3.rollup(
       main,
@@ -139,18 +147,19 @@ const drawLineChart = (main, registered) => {
       d => d[field],
       d => d.year
     ).forEach((yearMap, cat) => {
-      if (EXCLUDE.has(cat)) return;
+      if (EXCLUDE.has(cat)) return; // skip non-binary sex rows
       yearMap.forEach((hosp, year) => rows.push({ cat, year, hosp }));
     });
     return rows;
   }
 
   // ─── UPDATE ───────────────────────────────────────────────────────────────
+  // called on first load and whenever dimension, year, or mode changes
   function update() {
     const data = aggregate(currentDim);
-    const cats = [...new Set(data.map(d => d.cat))];
+    const cats = [...new Set(data.map(d => d.cat))]; // unique category list for this dimension
 
-    // totals per year for % mode
+    // totals per year for % mode - used to convert absolute counts to share of all hospitalisations
     const totals = d3.rollup(data, v => d3.sum(v, d => d.hosp), d => d.year);
 
     const getValue = d => currentMode === "percent"
@@ -231,7 +240,7 @@ const drawLineChart = (main, registered) => {
 
   // ─── EVENT WIRING ─────────────────────────────────────────────────────────
   document.getElementById("dimensionPicker").addEventListener("change", function() {
-    currentDim = this.value;
+    currentDim = this.value; // update active dimension
     stateFilter = null;
     stateLabel.text("");
     update();
@@ -241,11 +250,12 @@ const drawLineChart = (main, registered) => {
     btn.addEventListener("click", function() {
       document.querySelectorAll(".lc-mode-btn").forEach(b => b.classList.remove("active"));
       this.classList.add("active");
-      currentMode = this.dataset.mode;
+      currentMode = this.dataset.mode; // switch between absolute and % share
       update();
     });
   });
 
+  // yearChange and stateClick are CustomEvents fired by the year slider and choropleth respectively
   document.addEventListener("yearChange", e => {
     currentYear = e.detail.year;
     update();
