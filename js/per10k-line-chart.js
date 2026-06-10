@@ -304,7 +304,7 @@ const drawPer10kChart = (stateData, vehicleData) => {
 
   update();
 
-  // ── legend (made with GenAI) ──
+  // ── legend (made with GenAI Prompt: Can you make me a lengend for this code - Used for lines 308-324) ──
     const legendEl = document.getElementById("chart-per10k-legend");
     if (legendEl) {
       legendEl.innerHTML = `
