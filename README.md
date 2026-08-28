@@ -60,6 +60,4 @@ npx serve .
 
 ## Notes
 
-Coursework project — Swinburne University of Technology.Overlooked on the Road 🏍️
-
 Coursework project — Swinburne University of Technology.
