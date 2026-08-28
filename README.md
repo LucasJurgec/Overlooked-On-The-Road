@@ -4,7 +4,7 @@ A data visualisation project exploring motorcyclists as an overlooked road safet
 
 Live Demo
 
-🔗 View the live site <!-- https://lucasjurgec.github.io/Overlooked-On-The-Road/ -->
+🔗 View the live site at: https://lucasjurgec.github.io/Overlooked-On-The-Road/
 
 About
 
