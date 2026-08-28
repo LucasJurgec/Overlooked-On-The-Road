@@ -9,7 +9,7 @@ const STATE_TO_COL = { // match state names together
 
 // VIC changed admission counting in 2012; NSW in 2017.
 // Lines are split into segments so no connecting segment crosses either break year.
-const SERIES_BREAKS = new Set([2012, 2017]);
+const SERIES_BREAKS = new Set();
 
 function makeSegments(pts) {
   const segs = [];
