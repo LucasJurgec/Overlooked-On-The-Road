@@ -242,7 +242,6 @@ const drawLineChart = (main, registered) => {
   document.getElementById("dimensionPicker").addEventListener("change", function() {
     currentDim = this.value; // update active dimension
     stateFilter = null;
-    stateLabel.text("");
     update();
   });
 
